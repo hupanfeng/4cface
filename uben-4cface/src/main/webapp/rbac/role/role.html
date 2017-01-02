@@ -1,0 +1,101 @@
+<script type="text/javascript">
+    render(function (data, method) {
+        var prole = "";
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            $("#pLevelCode").val(data.pLevelCode);
+            $("#pid").val(data.pid);
+            if (!data.pid && data.pid == 0) {
+                prole = "";
+            } else {
+                prole = data.pid;
+            }
+        } else {
+            $("#mid").attr("disabled", "disabled");
+        }
+        $.ajax({
+            type: "get",
+            url: parent.$.modalDialog.path + "dataGrid",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.name;
+                    treeNode.state = "open";
+                    treeNode.pid = it.pid;
+                    treeNode.levelCode = it.levelCode;
+                    tree.push(treeNode);
+                });
+                $("#pid").combotree({
+                    parentField: "pid",
+                    data: tree,
+                    value: prole,
+                    onSelect: function (newValue) {
+                        $("#pLevelCode").val(newValue.levelCode);
+                    }
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.refresh();//之所以能在这里调用到parent.$.modalDialog.openner_dataGrid这个对象，是因为user.jsp页面预定义好了
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input name="mid" id="mid" type="hidden"/>
+            <table class="grid">
+                <tr style="height:40px">
+                    <td>角色名称</td>
+                    <td>
+                        <input name="name" placeholder="请输入角色名称" class="easyui-textbox"
+                               data-options="required:true,validType:'length[1,63]'" style="width:300px;height:28px" value=""/>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>角色描述</td>
+                    <td>
+                        <input name="description" class="easyui-textbox" data-options="multiline:true"
+                               style="width:300px;height:125px"/>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>上级角色</td>
+                    <td colspan="3">
+                        <input id="pLevelCode" name="pLevelCode" type="hidden"/>
+                        <input id="pid" name="pid" style="width: 300px;height:28px"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;"
+                           onclick="$('#pid').combotree('clear');">
+                            清空
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

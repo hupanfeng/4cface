@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="shortcut icon" href="../../style/images/index/favicon.png"/>
+        <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+        <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+        <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+        <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+        <title>组织管理</title>
+        </head>
+        <body class="easyui-layout" data-options="fit:true,border:false">
+        <div data-options="region:'center',border:false">
+            <table id="dataGrid" class="easyui-treegrid">
+        <thead>
+        <tr>
+            <th data-options="field:'mid',width:100,align:'left',hidden:'true'">id</th>
+            <th data-options="field:'orgName',width:250,align:'left'">组织名称</th>
+            <th data-options="field:'orgNo',width:100,align:'left'">编号</th>
+            <th data-options="field:'action',width:160,align:'center',hidden:'true'">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<div id="toolbar" style="display: none;">
+    <a resource="add" onclick="add('org.html','组织',null,320) ;" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-add'">添加</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="edit" onclick="edit(null,'org.html','组织',null,320);" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-edit'">修改</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="delete" onclick="del(null,'delete');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">删除</a>
+</div>
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    loader.load('common', function () {
+        $(function () {
+            window.refresh = function () {
+                $('#dataGrid').treegrid('reload');
+            }
+            $("#dataGrid").treegrid({
+                toolbar: "#toolbar",
+                url: "dataGrid",
+                idField: "mid",
+                treeField: "orgName",
+                fitColumns: "true",
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: false,
+                pagination: false,
+                singleSelect: "true",
+                onDblClickRow: function (rowdata) {
+                    if (isPermit("edit")) {
+                        edit(rowdata.mid, 'org.html', '组织',null,320);
+                }
+            }
+        });
+        $("#toolbar").find("a").each(function () {
+            var resource = $(this).attr("resource");
+            if (!isPermit(resource)) {
+                $(this).hide();
+                $(this).next().remove();
+                }
+            });
+        });
+    });
+    function refresh() {
+        $("#dataGrid").treegrid('reload');
+    }
+</script>
+</body>
+</html>

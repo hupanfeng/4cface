@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <script type="text/javascript" src="../../js/loader.js"></script>
+    <title>菜单管理</title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'west',border:false,split:true" title="公众号"
+     style="width:200px;overflow: hidden;overflow-y:auto; ">
+    <ul id="appsTree" style="width:180px;margin: 10px 10px 10px 10px">
+        <li data-options="field:'appName',sortable:true,width:80"></li>
+    </ul>
+</div>
+<div id="toolbar" style="display: none;">
+    <a resource="add" onclick="add('menu.html','菜单');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-add'">添加</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="edit" onclick="edit(null,'menu.html','菜单');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-edit'">修改</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="delete" onclick="del(null,'delete');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">删除</a>
+    <a resource="sync" onclick="sync(null,'sync');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">同步数据</a>
+</div>
+<div data-options="region:'center',border:false">
+    <form id="searchForm" style="line-height:40px">
+        <span class="datagrid-btn-separator"></span>
+        <strong style="margin-right: 5px">菜单名称:</strong><input name="appName" placeholder="请输入菜单名称"
+                                                               class="easyui-textbox" style="height:25px"/>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" style="padding: 0 20px;"
+           data-options="iconCls:'icon_search'" onclick="ubenSearch();">查询</a>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_cancel',plain:true"
+           onclick="ubenClean();">清空</a>
+    </form>
+    <table id="dataGrid" class="easyui-treegrid">
+        <thead>
+        <tr>
+            <th data-options="field:'name',sortable:true,align:'center',width:150">菜单名</th>
+            <th data-options="field:'responseType',sortable:true,align:'center',width:150">响应动作类型</th>
+            <th data-options="field:'menuType',sortable:true,align:'center',width:150" formatter="menuType">菜单类型</th>
+            <th data-options="field:'menukey',sortable:true,align:'center',width:150">key</th>
+            <th data-options="field:'url',sortable:true,align:'center',width:150">网页链接</th>
+            <th data-options="field:'orderNum',align:'center',width:100">序号</th>
+            <th data-options="field:'matchruleId',align:'center',width:100">匹配规则</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<script type="text/javascript">
+    var appid = "";
+    loader.load('common', function () {
+        $(function () {
+            $.ajax({
+                type: "get",
+                url: store.get("context") + "/wx/app/dataApps",
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    var tree = new Array();
+                    result.rows.forEach(function (it) {
+                        var treeNode = new Object();
+                        treeNode.id = it.appid;
+                        treeNode.text = it.appName;
+                        tree.push(treeNode);
+                    });
+                    $('#appsTree').tree({
+                        data: tree,
+                        onClick: function (node) {
+                            appid = node.id;
+                            $('#dataGrid').treegrid({
+                                toolbar: "#toolbar",
+                                url: store.get("context") + "/wx/menu/dataByApp?appid=" + appid,
+                                idField: "mid",
+                                treeField: "name",
+                                fitColumns: "true",
+                                sortName: "mid",
+                                sortOrder: "asc",
+                                rownumbers: false,
+                                pagination: false,
+                                singleSelect: "true",
+                                onDblClickRow: function (rowdata) {
+                                    if (isPermit("edit")) {
+                                        edit(rowdata.mid, 'menu.html', '公众号');
+                                    }
+                                }
+                            });
+                            $("#toolbar").find("a").each(function () {
+                                var resource = $(this).attr("resource");
+                                if (!isPermit(resource)) {
+                                    $(this).hide();
+                                    $(this).next().remove();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+    function refresh() {
+        $("#dataGrid").treegrid('reload');
+    }
+    function menuType(value, row, index) {
+        if (value == "1") {
+            return "普通菜单"
+        } else if (value == "2") {
+            return "个性化菜单"
+        }
+        return "";
+    }
+    function sync() {
+        progressLoad();
+        $.post(
+                "sync?appid=" + appid,
+                function (result) {
+                    if (result) {
+                        parent.$.messager.alert('提示', result.msg, 'info');
+                        //$('#dataGrid').datagrid('reload');
+                        refresh();
+                    }
+                    progressClose();
+                },
+                'JSON'
+        );
+    }
+</script>
+</body>
+</html>

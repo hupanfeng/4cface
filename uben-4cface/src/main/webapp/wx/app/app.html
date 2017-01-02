@@ -1,0 +1,103 @@
+<script type="text/javascript">
+    render(function (data, method) {
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+        } else {
+            $("#mid").attr("disabled", "disabled");
+        }
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.openner_dataGrid.datagrid('reload');
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input id="mid" name="mid" type="hidden"/>
+            <table class="grid">
+                <tr  style="height:40px">
+                    <td align="center">公众号名称</td>
+                    <td>
+                        <input name="appName" class="easyui-textbox"
+                               data-options="width:230,required:true,validType:'length[2,16]',prompt:'请输入公众号名称'" style="height:28px">
+                    </td>
+                    <td align="center">应用ID</td>
+                    <td>
+                        <input name="appid" class="easyui-textbox"
+                               data-options="width:230,required:true,prompt:'请输入公众号应用ID'"  style="height:28px">
+                    </td>
+                </tr>
+                <tr  style="height:40px">
+                    <td align="center">密&nbsp;&nbsp;钥</td>
+                    <td>
+                        <input name="secret" class="easyui-textbox"
+                               data-options="width:230,required:true,prompt:'请输入密钥'"  style="height:28px">
+                    </td>
+                    <td align="center">TOKEN</td>
+                    <td>
+                        <input name="token" class="easyui-textbox"
+                               data-options="width:230,required:true,prompt:'请输入TOKEN'"  style="height:28px"/>
+                    </td>
+                </tr>
+                <tr  style="height:40px">
+                    <td align="center">类&nbsp;&nbsp;型</td>
+                    <td>
+                        <select name="type" class="easyui-combobox"
+                                data-options="width:230,editable:false,panelHeight:'auto'"  style="height:28px">
+                            <option value="1">订阅号</option>
+                            <option value="2" selected="selected">服务号</option>
+                            <option value="3">企业号</option>
+                        </select>
+                    </td>
+                    <td align="center">状&nbsp;态</td>
+                    <td>
+                        <select name="status" class="easyui-combobox"
+                                data-options="width:230,editable:false,panelHeight:'auto'"  style="height:28px">
+                            <option value="0">停用</option>
+                            <option value="1" selected="selected">正常</option>
+                        </select>
+                    </td>
+
+                </tr>
+                <tr style="height:40px">
+                    <td align="center">客服状态</td>
+                    <td>
+                        <select name="cusStatus" class="easyui-combobox"
+                                data-options="width:230,editable:false,panelHeight:'auto'"  style="height:28px">
+                            <option value="0">停用</option>
+                            <option value="1" selected="selected">正常</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>欢 迎 词</td>
+                    <td colspan="3"><input name="welcome" class="easyui-textbox" data-options="required:true,multiline:true"
+                                           style="width:480px;height:120px"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

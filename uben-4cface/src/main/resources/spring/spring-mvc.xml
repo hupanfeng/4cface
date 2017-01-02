@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 自动扫描controller包下的所有类，使其认为spring mvc的控制器 -->
+    <context:component-scan base-package="xyz.uben.**.interfaces"/>
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- Spring MVC JSON配置 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="false">
+            <bean id="fastJsonHttpMessageConverter" class="xyz.uben.common.infra.util.web.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!--
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean id="fastJsonHttpMessageConverter" class="xyz.uben.dims.util.web.FastJsonHttpMessageConverter">
+					<property name="supportedMediaTypes">
+						<list>
+							<value>text/html;charset=UTF-8</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>-->
+
+    <!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <!-- 配置spring多文件上传 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding">
+            <value>UTF-8</value>
+        </property>
+        <property name="maxUploadSize">
+            <value>32505856</value><!-- 上传文件大小限制为31M，31*1024*1024 -->
+        </property>
+        <property name="maxInMemorySize">
+            <value>4096</value>
+        </property>
+    </bean>
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="xyz.uben.common.rbac.interfaces.SecurityInterceptor">
+                <!-- 不需要权限验证的地址,正则匹配-->
+                <property name="excludeUrls">
+                    <list>
+                        <value>/login</value>
+                        <value>/logout</value>
+                        <value>/editpwd</value>
+                        <value>/weixin*</value>
+                        <value>/ueditor/*</value>
+                        <value>/upload*</value>
+                        <value>/doc/get/*</value>
+                        <value>/doc/dataGrid</value>
+                        <value>/cases/get/*</value>
+                        <value>/passWord/*</value>
+                        <value>/register/*</value>
+                        <value>/wx/fan/bind</value>
+                        <value>/wx/fan/get</value>
+                        <value>/search*</value>
+                        <value>/toolcategory/list</value>
+                        <value>/toolInformation/dataGrid</value>
+                        <value>/cases/dataGrid</value>
+                        <value>/rbac/user/approval</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!-- 对静态资源文件的访问 -->
+    <mvc:resources mapping="/js/**" location="/js/"/>
+    <mvc:resources mapping="/style/**" location="/style/"/>
+    <mvc:resources mapping="/wap/**" location="/wap/"/>
+    <mvc:resources mapping="/*.html" location="/"/>
+    <mvc:resources mapping="/*.txt" location="/"/>
+</beans>

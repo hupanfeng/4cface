@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>井下作业修井工具数据库系统</title>
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" href="css/mui.previewimage.css">
+    <link href="../ueditor/third-party/video-js/video-js.min.css" rel="stylesheet">
+    <script src="../ueditor/third-party/video-js/video.js"></script>
+    <script src="../ueditor/third-party/video-js/video.dev.js"></script>
+    <script src="../ueditor/third-party/video-js/html5media.min.js"></script>
+    <style>
+        .weui_article h1 {
+            margin-bottom: 0;
+        }
+
+        .article_tit {
+            margin-top: 8px;
+            color: #666;
+        }
+
+        .article_section {
+            width: 100%;
+            margin-top: 35px;
+            line-height: 2;
+        }
+
+        /*.article_section p {*/
+        /*margin-top: -10px;*/
+        /*}*/
+
+        .article_tit span {
+            margin-right: 10px;
+        }
+
+        .Related_case h4 {
+            margin-bottom: 5px;
+        }
+
+        .Related_case a {
+            display: block;
+            line-height: 1.8;
+        }
+
+        .article_tit a {
+            text-decoration: none;
+        }
+
+        .article_section {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .article_section img, .article_section p img {
+            display: block;
+            max-width: 100%;
+            min-width: 300px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        #article {
+            width: 94%;
+            overflow: hidden;
+            margin: 15px auto 0;
+        }
+
+        .docItem-tit {
+            font-size: 17px
+        }
+    </style>
+</head>
+<body>
+<article class="weui_article " id="article">
+    <h1 class="docItem-tit">{{title}}</h1>
+    <p class="article_tit">
+        <span>时间:{{createTime}} </span><span>作者:{{authorName}}</span>
+    </p>
+    <section class="article_section" id="content">
+
+    </section>
+    <p class="article_tit" onclick="gotoUser()" id="allContent" style="display: none;">
+        <a href="javascipt:void(0);">查看全文</a>
+    </p>
+    <div class="Related_case">
+        <h4>相关案列：</h4>
+        <a href="javascript:void(0);" v-for="c in cases" @click="showCase(c)">{{c.title}}</a>
+    </div>
+</article>
+<script type='text/javascript' src="js/lib/mui.min.js" charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='js/lib/vue.min.js' charset='utf-8'></script>
+<script type='text/javascript' src="js/lib/lodash.min.js"></script>
+<script type='text/javascript' src="js/lib/mui.previewimage.js"></script>
+<script type='text/javascript' src="js/lib/mui.zoom.js"></script>
+<script>
+    $(function () {
+        mui.previewImage();
+
+        var url = decodeURI(window.location.href);
+        var docId = url.indexOf("?") != -1 ? url.split("?")[1] : undefined;
+        $.ajax({
+            type: 'GET',
+            url: '../doc/get/' + docId,
+            timeout: 3000,
+            dataType: "json",
+            success: function (response) {
+                if (response) {
+                    article.authorName = response.authorName;
+                    article.title = response.title;
+                    article.createTime = response.createTime;
+                    article.cases = response.cases;
+                    if (response.selectUser) {
+                        $("#allContent").hide();
+                    } else {
+                        $("#allContent").show();
+                    }
+                    var content = "";
+                    $.each(response.contentList, function (index, obj) {
+                        content += obj.content;
+                    });
+//                      article.content = content;
+                    $("#content").html(content);
+                    //图片处理
+                    var imgs = $("img");
+                    $.each(imgs, function (i, o) {
+                        //获取img的src属性
+                        var src = $(o).attr("src");
+                        $(o).attr("data-preview-src", src);
+                        //获取用/分割的字符串数组
+                        var temps = src.split("/");
+                        //在图片链接前加上thumb/
+                        temps[temps.length - 1] = "thumb/" + temps[temps.length - 1];
+                        //将字符串数组拼接成一个用/链接的字符串
+                        src = temps.join("/");
+                        //设置图片的src路径
+                        $(o).attr("src", src);
+                        $(o).attr("data-preview-group", "1");
+
+                    });
+                    //视频处理
+                    var video = $("video");
+                    $.each(video, function (i, o) {
+                        var src = $(o).attr("src");
+                        $(o).click(function () {
+                            o.play();
+                        });
+                    });
+                }
+                mui.init();
+            },
+            error: function (xhr, type) {
+                mui.init();
+            }
+        })
+
+    });
+    var article = new Vue({
+        el: '#article',
+        data: {
+            authorName: [],
+            title: [],
+            createTime: {},
+            cases: [],
+        },
+        methods: {
+            showCase: function (c) {
+                window.location.href = "caseItem.html?" + c.mid;
+            }
+        }
+    });
+
+    function gotoUser() {
+        window.location.href = "user.html";
+    }
+
+    function refresh() {
+        window.location.reload(true);
+    }
+</script>
+
+</body>
+</html>

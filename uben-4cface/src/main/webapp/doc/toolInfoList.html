@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../style/main.css"/>
+    <title></title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'center',border:false">
+    <table id="dataGrid" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'toolName',align:'left',sortable:true,width:200">工具名称</th>
+            <th data-options="field:'code',align:'left',sortable:true,width:100">编码</th>
+            <th data-options="field:'state',sortable:true,align:'center',width:100" formatter="showStockState">库存状态</th>
+            <th data-options="field:'warName',align:'left',sortable:true,width:100">所属仓库</th>
+            <th data-options="field:'time',align:'left',sortable:true,width:200">价格参考时间</th>
+            <th data-options="field:'price',align:'left',sortable:true,width:100">价格</th>
+            <th data-options="field:'remark',align:'left',sortable:true,width:200">备注</th>
+            <th data-options="field:'manufactor',align:'left',sortable:true,width:200">厂家</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<script type="text/javascript" src="./js/loader.js"></script>
+<script src="./js/lib/store.js" charset="utf-8"></script>
+<script type="text/javascript">
+    render(function (data, method) {
+        $(function () {
+            $("#dataGrid").datagrid({
+                url : store.get("context") + "/toolInformation/dataGrid?docId=" + data,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagination: true,
+                pagePosition: "bottom",
+                pageList: [10, 50, 100, 200, 500],
+                pageSize: 10,
+                singleSelect: "true",
+            });
+        });
+    });
+    /**显示出库存状态*/
+    function showStockState(value, row, index) {
+        if (value == "1") {
+            return "在库";
+        }
+        return "出库";
+    }
+</script>
+</body>
+
+</html>

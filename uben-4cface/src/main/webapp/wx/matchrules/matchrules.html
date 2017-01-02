@@ -1,0 +1,168 @@
+<script type="text/javascript">
+    render(function (data, method) {
+        var appid = store.get("appid");
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            $("[group='group']").remove();
+            getGroup(data.appid, data);
+        } else {
+            $("#mid").attr("disabled", "disabled");
+            $("[group='group']").remove();
+        }
+        $.ajax({
+            type: "get",
+            url: store.get("context") + "/wx/app/dataApps",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.appName;
+                    treeNode.value = it.appid;
+                    tree.push(treeNode);
+                });
+                $("#appid").combobox({
+                    data: tree,
+                    editable: false,
+                    onSelect: function (r) {
+                        $("[group='group']").remove();
+                        getGroup(r.value, null);
+                    }
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.refresh();
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+    function getGroup(appid, data) {
+        $("#apptr").append(
+        "<td group='group'>标签</td>" +
+        "<td group='group'>" +
+        "<input id=\"tagId\" name=\"tagId\" style=\"width: 190px;\"/>" +
+        "<a class=\"easyui-linkbutton fr\" href=\"javascript:void(0)\" style=\"margin-left:3px;\"" +
+        "onclick=\"$('#groupId').combobox('clear');\">" +
+        "清空</a>" +
+        "</td>"
+        );
+        $("[class = 'easyui-linkbutton fr']").linkbutton({});
+        $.ajax({
+            type: "get",
+            url: store.get("context") + "/wx/group/dataGrid?appid=" + appid,
+            cache: false,
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.name;
+                    treeNode.state = "open";
+                    treeNode.value = it.groupid;
+                    tree.push(treeNode);
+                });
+                var group = "";
+                if(data){
+                    group =  data.groupId;
+                }
+                $("#tagId").combobox({
+                    data: tree,
+                    editable: false,
+                    value : group
+                });
+            }
+        });
+    }
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input id="mid" name="mid" type="hidden"/>
+            <table class="grid" width="100%">
+                <tr style="height:40px">
+                    <td align="center">规则名称</td>
+                    <td>
+                        <input name="name" id="name" class="easyui-textbox"
+                               data-options="width:230;" style="height:28px">
+                    </td>
+                    <td align="center">客户端版本</td>
+                    <td style="height:28px">
+                        <select name="clientPlatformType" id="clientPlatformType" class="easyui-combobox"
+                                data-options="width:230"  style="height:22px">
+                            <option value="">Null</option>
+                            <option value="1">IOS</option>
+                            <option value="2">Android</option>
+                            <option value="3">Others</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td align="center">性&nbsp;&nbsp;&nbsp;&nbsp;别</td>
+                    <td style="height:22px">
+                        <select name="sex" id="sex" class="easyui-combobox"
+                                data-options="width:230"  style="height:22px">
+                            <option value="1">男</option>
+                            <option value="2">女</option>
+                        </select>
+                    </td>
+                    <td align="center">语言信息</td>
+                    <td>
+                        <input name="language" id="language" class="easyui-textbox"
+                               data-options="width:230"  style="height:22px"/>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td align="center">地区信息</td>
+                    <td colspan="3">
+                        国&nbsp;&nbsp;家 ：<input name="country" id="country" class="easyui-textbox"
+                                   data-options="width:140"  style="height:22px"/>
+                        省&nbsp;&nbsp;份：<input name="province" id="province" class="easyui-textbox"
+                                  data-options="width:140" style="height:22px"/>
+                        城&nbsp;&nbsp;市：<input name="city" id="city" class="easyui-textbox"
+                                  data-options="width:140" style="height:22px"/>
+                    </td>
+                </tr>
+                <tr id="apptr" style="height:40px">
+                    <td align="center">公 众 号</td>
+                    <td>
+                        <input id="appid" name="appid" style="width: 190px;height:28px" data-options="required:true"  />
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;"
+                           onclick="$('#appid').combobox('clear');">
+                            清空
+                        </a>
+                    </td>
+                    <td group="group">标&nbsp;&nbsp;签</td>
+                    <td group="group">
+                        <input id="tagId" name="tagId" style="width: 190px;height:22px"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;"
+                           onclick="$('#tagId').combobox('clear');">
+                            清空
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

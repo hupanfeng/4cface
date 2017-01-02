@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,target-densitydpi=high-dpi,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>井下作业修井工具数据库系统</title>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <style>
+        .tkb_tit {
+            text-align: center;
+            font-size: 1.3em;
+
+            color: #3d4145;
+            font-family: sans-serif;
+        }
+
+        .mui-off-canvas-wrap {
+            height: auto;
+        }
+
+        .mui-off-canvas-wrap .mui-inner-wrap {
+            height: auto;
+        }
+
+        .mui-scroll, .mui-scroll-wrapper {
+            position: static;
+        }
+
+        body {
+            height: auto;
+        }
+
+        .fl {
+            float: left;
+        }
+
+        .fr {
+            float: right;
+        }
+
+        .mui-table-view > li {
+            width: 100%;
+            overflow: hidden;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+
+        }
+
+        .mui-table-view > li.last {
+            border: none
+        }
+
+        .mui-table-view li a {
+            display: block;
+            width: 97%;
+            padding: 10px 0;
+            color: #444;
+        }
+
+        .mui-table-view li span {
+            width: 20%;
+            display: block;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .item_list {
+            width: 100%;
+            overflow: hidden;
+            list-style: none;
+            display: none;
+        }
+
+        .item_list li {
+            width: 100%;
+            overflow: hidden;
+            background-color: #fff;
+            padding-left: -50px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .item_list li a{
+            width: 100%;
+            display: block;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .item_list li.first {
+            border: none;
+        }
+
+        .mui-table-view li > .tool_list_li {
+            width: 100%;
+            overflow: hidden;
+            padding-left: 15px;
+            font-size: 17px;
+            margin-bottom: 0;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .on {
+            background-color: #eee;
+        }
+
+        .mui-navigate-right {
+            width: 100%;
+            display: block;
+            font-size: inherit;
+            position: relative;
+            top: 50%;
+            text-decoration: none;
+
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="mui-off-canvas-wrap mui-draggable" id="page">
+    <!-- 主页面容器 -->
+    <div class="">
+        <!-- 主页面标题 -->
+        <header class="mui-bar mui-bar-nav">
+            <!-- <a class="mui-icon mui-action-menu mui-icon-bars mui-pull-left"></a>-->
+            <h1 class="mui-title">工具分类</h1>
+        </header>
+        <div class="mui-content mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <ul class="mui-table-view" id="tool_list">
+                    <li  v-for="category in categories">
+                        <p class="tool_list_li">
+                            <a href="javascript:void(0)" style="width:70%;" class="fl" @click="showDocs(category)">{{category.categoryName}}</a>
+                            <span class="fr" @click="showSub()"><img src="images/down1.png" width="12px"></span>
+                        </p>
+                        <ul class="item_list">
+                            <li class="item_list_li" v-for="subCategory in category.subCategorys">
+                                <!--<a href="logo.html" class="mui-navigate-right">打捞工具打捞工具打捞工具</a>-->
+                                <a class="mui-navigate-right" :href="subCategory.url"
+                                   @click="showDocs(subCategory)" id="child_menu">{{subCategory.categoryName}}</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type='text/javascript' src="js/lib/mui.min.js" charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='js/lib/vue.min.js' charset='utf-8'></script>
+<script type='text/javascript' src="js/lib/lodash.min.js"></script>
+<script type="text/javascript" src="js/lib/jquery-1.12.4.js"></script>
+<script>
+    $(function () {
+        mui('body').on('tap', '.fr', function () {
+            $(this).parent().siblings('.item_list').toggle();
+            $('#tool_list .item_list li:not(:first)').css({
+                'border-top':'1px solid #eee'
+            });
+            $(this).parent().addClass('on').parent().siblings().find('p').removeClass('on');
+        })
+        $.ajax({
+            type: 'GET',
+            url: '../toolcategory/list?pid=0',
+            timeout: 3000,
+            dataType: "json",
+            success: function (response) {
+                if (response) {
+                    pageVM.categories = response;
+                    if (response) {
+                        response.forEach(function (category) {
+                            if (category.subCategorys) {
+                                category.subCategorys.forEach(function (subCategory) {
+                                    subCategory.url = "docs.html?category=" + subCategory.categoryName + "&levelCode=" + subCategory.levelCode;
+                                });
+                            }
+                        });
+                    }
+                }
+                mui.init();
+            },
+            error: function (xhr, type) {
+                mui.init();
+            }
+        })
+    });
+    var pageVM = new Vue({
+        el: '#page',
+        data: {
+            categories: [],
+            subCategories: [],
+            category: {},
+            subCategory: {},
+            docs: [],
+            page: {currentPage: 1, pageSize: 10},
+            loading: false
+        },
+        methods: {
+            showDocs: function (category) {
+                window.location.href = "docs.html?category=" + category.categoryName + "&levelCode=" + category.levelCode;
+            },
+            showSub: function () {
+                $(this).parent().siblings().toggle();
+                $('#tool_list .item_list li:not(:first)').css({
+                    'border-top': '1px solid #eee'
+                });
+                $(this).addClass('on').parent().parent().siblings().find('p').removeClass('on');
+            }
+        }
+    });
+
+    function refresh() {
+        window.location.reload(true);
+    }
+
+</script>
+</body>
+</html>

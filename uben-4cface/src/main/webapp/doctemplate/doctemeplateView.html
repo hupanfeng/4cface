@@ -1,0 +1,23 @@
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" id="content">
+    </div>
+</div>
+<script type="text/javascript">
+    render(function (data, method) {
+        $(function () {
+            $.ajax({
+                type: "get",
+                url: parent.$.modalDialog.path + data.id,
+                dataType: "json",
+                cache: false,
+                success: function (result) {
+                    if (result) {
+                        $.each(result.contents, function (index, obj) {
+                           $("#content").append(obj.content);
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>

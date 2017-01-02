@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <link rel="shortcut icon" href="./style/images/index/favicon.png"/>
+    <!-- 登录页css -->
+    <link rel="stylesheet" type="text/css" href="./style/login.css">
+    <!-- 引入jQuery,支持IE8 -->
+    <script type="text/javascript" src="./js/lib/jquery-1.8.3.min.js" charset="utf-8"></script>
+    <!-- 引入AngularJs,支持IE8 -->
+    <script type="text/javascript" src="./js/lib/angular1.2.29/angular.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/lib/jquery.cookie.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/lib/store.js" charset="utf-8"></script>
+    <title>用户登录</title>
+    <script type="text/javascript">
+        var app = angular.module('loginApp', []);
+        app.controller('LoginCtrl', function ($scope) {
+            $scope.loginUser = {loginname: '', password: ''};
+            var cookieUser = JSON.parse($.cookie('remberPass') ? $.cookie('remberPass') : false);
+            if (cookieUser) {
+                $scope.loginUser.loginname = cookieUser.loginname;
+                $scope.loginUser.password = cookieUser.password;
+                $scope.loginUser.remberPass = cookieUser.remberPass;
+            }
+            $scope.btnLoginText = '登录';
+            $scope.errorMessage = "";
+            $scope.btnLogin = function () {
+                $scope.btnLoginText = '登录中...';
+                $.ajax({
+                    type: "post",
+                    contentType: "application/json; charset=utf-8",
+                    url: "login",
+                    data: JSON.stringify($scope.loginUser),
+                    cache: false,
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.success) {
+                            // 记住密码
+                            $scope.remberPass();
+                            store.set("user", result.obj.user);
+                            store.set("resources", result.obj.resources);
+                            store.set("context", result.obj.context);
+                            window.location.href = 'home.html';
+                        } else {
+                            $scope.errorMessage = result.msg;
+                            $scope.btnLoginText = '登录';
+                            $scope.$apply();
+                            setTimeout(function () {
+                                $scope.errorMessage = "";
+                                $scope.$apply();
+                            }, 3000);
+                        }
+                    }
+                });
+            };
+            // 记住用户名
+            $scope.remberPass = function () {
+                // 是否记住密码
+                if ($scope.loginUser.remberPass) {
+                    if ($.cookie('remberPass') == 'null' || $.cookie('remberPass') == undefined) {
+                        $.cookie('remberPass', JSON.stringify($scope.loginUser), {expires: 30, path: "/"});
+                    } else {
+                        var cookieUserName = JSON.parse($.cookie('remberPass') ? $.cookie('remberPass') : false);
+                        if (cookieUserName && cookieUserName.loginname != $scope.loginUser.loginname) {
+                            $.cookie('remberPass', JSON.stringify($scope.loginUser), {expires: 30, path: "/"});
+                        }
+                    }
+                } else {
+                    $.cookie('remberPass', null, {path: "/"});
+                }
+            }
+
+        });
+    </script>
+    <style>
+       body {
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+            font-family: 'Microsoft YaHei';
+            background: url(style/images/bgimg2.jpg) no-repeat center;
+            margin: 0 auto;
+            background-size:100%;
+       }
+       body{
+           filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='style/images/bgimg2.jpg', sizingMethod='scale')\9;
+       }
+        body img {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            background-size:100%;
+        }
+    </style>
+</head>
+
+<body ng-app="loginApp" ng-controller="LoginCtrl" id="bg">
+<div id="background">
+<div class="form-box-wrap">
+    <div class="form-box">
+        <form name="loginForm">
+            <div class=" loginForm_tit">
+                <h4>4C菲斯会员管理系统</h4>
+            </div>
+            <div class="list">
+                <div class="padding">
+                    <ul class="inputbox login_ul">
+                        <li><span class="input-label">用户名:</span>
+                            <input ng-model="loginUser.loginname" ng-keyup="myKeyup($event)" class="username"
+                                   type="text" ng-disabled="btnLogin=='登录中...'"></li>
+                        <li style="border-bottom:none;">
+                            <span class="input-label">密　码:</span>
+                            <input ng-model="loginUser.password" ng-keyup="myKeyup($event)" class="password"
+                                   type="password" ng-disabled="btnLogin=='登录中...'">
+                        </li>
+                    </ul>
+                </div>
+                <div class="padding-right text-right">
+                    <div class="remberPass">
+                        <input type="checkbox" ng-model="loginUser.remberPass" id="remberPassCB"><label
+                            for="remberPassCB">记住密码</label>
+                        <a href="findPassword.html" class="forget_pass">忘记密码</a>
+                    </div>
+
+                </div>
+                <div class="padding">
+                    <button ng-click="btnLogin()" class="button-login" ng-bind="btnLoginText"
+                            ng-disabled="btnLoginText=='登录中...' ||  !loginUser.loginname.length || !loginUser.password.length">
+                        登录
+                    </button>
+                </div>
+                <div class="error-box ng-hide" ng-show="errorMessage">
+                    <div class="error-info">
+                        <span class="error-icon ion-information-circled"> </span><span ng-bind="errorMessage"></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<div class="copyright">
+    <p>Copyright&nbsp;&copy;4C菲斯逆龄美肤中心</p>
+</div>
+<!--[if lt IE 8]>
+<style media="screen">
+    .remind {
+        display: none;
+    }
+
+    .browsehappy {
+        display: block;
+        text-align: center;
+        color: #333;
+        background: #fafb81;
+        margin: 0 25px;
+        padding: 10px;
+        border: 1px solid #eee;
+    }
+
+    .browsehappy a {
+        color: red;
+    }
+
+</style>
+<p class="browsehappy">
+    你正在使用一个<strong>过时</strong>的浏览器。请<a class="link" href="http://browsehappy.com" target="_blank">升级你的浏览器</a>
+    以查看本网页。推荐下载使用
+    <a target="_blank" href="http://se.360.cn">360安全浏览器</a>、
+    <a target="_blank" href="http://www.firefox.com.cn/download/">火狐浏览器</a>。
+</p>
+</p>
+<![endif]-->
+
+</body>
+
+<script>
+    window.onload=function(){
+        $(function(){
+            $('#bg').height($(window).height());
+            $('#bg').width($(window).width());
+        });
+    }
+
+</script>
+</body>
+</html>

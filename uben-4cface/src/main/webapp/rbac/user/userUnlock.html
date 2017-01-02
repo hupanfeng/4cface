@@ -1,0 +1,54 @@
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <input type="hidden" id="mid" name="mid"/>
+        <table class="grid">
+            <tr>
+                <td>用户</td>
+                <td><p id="name"></p></td>
+            </tr>
+            <tr>
+                <td>状态</td>
+                <td><p id="state"></p></td>
+            </tr>
+            <tr>
+                <td>密码错误次数</td>
+                <td><p id="errcount"></p></td>
+            </tr>
+            <tr>
+                <td>账号解锁时间</td>
+                <td><p id="expirationDate"></p></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    render(function (data, method) {
+        $(function () {
+            $("#mid").val(data.id);
+            $.ajax({
+                type: "get",
+                url: parent.$.modalDialog.path + data.id,
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    $("#name").text(result.name);
+                    if (result.stateid && result.stateid > 0) {
+                        $("#state").text("正常");
+                    } else {
+                        $("#state").text("停用");
+                    }
+                    if (result.errcount) {
+                        $("#errcount").text(result.errcount);
+                    } else {
+                        $("#errcount").text(0);
+                    }
+                    if (result.expirationDate) {
+                        $("#expirationDate").text(result.expirationDate);
+                    } else {
+                        $("#expirationDate").text('用户未被锁定');
+                    }
+                }
+            });
+        });
+    });
+</script>

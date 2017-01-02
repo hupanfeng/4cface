@@ -1,0 +1,134 @@
+<script type="text/javascript">
+    render(function (data, method) {
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            $("#pLevelCode").val(data.pLevelCode);
+        } else {
+            $("#mid").attr("disabled", "disabled");
+        }
+        $.ajax({
+            type: "get",
+            url: parent.$.modalDialog.path + "dataGrid",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    if (it.resourcetype == '0') {
+                        var treeNode = new Object();
+                        treeNode.id = it.mid;
+                        treeNode.text = it.name;
+                        if (it.pid == '0') {
+                            treeNode.state = 'closed';
+                        } else {
+                            treeNode.state = 'open';
+                        }
+                        treeNode.pid = it.pid;
+                        treeNode.iconCls = it.icon;
+                        treeNode.levelCode = it.levelCode;
+                        tree.push(treeNode);
+                    }
+                });
+                $('#pid').combotree({
+                    parentField: 'pid',
+                    data: tree,
+                    onSelect: function (newValue) {
+                        $("#pLevelCode").val(newValue.levelCode);
+                    }
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.refresh();
+                        parent.$.modalDialog.handler.dialog('close');
+                    }
+                }
+            });
+
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input id="mid" name="mid" type="hidden"/>
+            <table class="grid">
+                <tr style="height:40px">
+                    <td>资源名称</td>
+                    <td colspan="3">
+                        <input name="name" class="easyui-textbox"
+                               data-options="required:true,width:550,prompt:'请输入资源名称'" style="height:28px"/>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>资源路径</td>
+                    <td colspan="3">
+                        <input name="url" placeholder="请输入资源路径" class="easyui-textbox"
+                               data-options="width:550" style="height:28px"/>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>资源类型</td>
+                    <td>
+                        <select name="resourcetype" class="easyui-combobox"
+                                data-options="required:true,width:180,editable:false,panelHeight:'auto'" style="height:28px">
+                            <option value="0">菜单</option>
+                            <option value="1">按钮</option>
+                        </select>
+                    </td>
+                    <td>状&nbsp;&nbsp;态</td>
+                    <td >
+                        <select name="stateid" class="easyui-combobox"
+                                data-options="required:true,width:180,editable:false,panelHeight:'auto'" style="height:28px">
+                            <option value="1">正常</option>
+                            <option value="0">停用</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>菜单图标</td>
+                    <td>
+                        <input name="icon" id="icon" class="easyui-textbox" placeholder="请输入菜单图标"
+                               data-options="width:180,editable:true,panelHeight:'auto'"style="height:28px"></td>
+                    <td>排序编号</td>
+                    <td>
+                        <input id="sortno" name="sortno" class="easyui-numberspinner" style="width:180px;height:28px"
+                               required="required" data-options="min:0,max:1000,editable:true">
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>上级资源</td>
+                    <td colspan="3">
+                        <input id="pLevelCode" name="pLevelCode" type="hidden"/>
+                        <input id="pid" name="pid" style="width: 518px;height:28px"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;"
+                           onclick="$('#pid').combotree('clear');">
+                            清空
+                        </a>
+                    </td>
+                </tr>
+                <tr >
+                    <td>备注</td>
+                    <td colspan="3"><input name="description" class="easyui-textbox" data-options="multiline:true"
+                                           style="width:550px;height:120px"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

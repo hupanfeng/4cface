@@ -1,0 +1,47 @@
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <input type="hidden" id="mid" name="mid"/>
+        <table class="grid">
+            <tr>
+                <td>模板id</td>
+                <td><p id="template_id"></p></td>
+            </tr>
+            <tr>
+                <td>模板标题</td>
+                <td><p id="title"></p></td>
+            </tr>
+            <tr>
+                <td>一级行业</td>
+                <td><p id="primary_industry"></p></td>
+            </tr>
+            <tr>
+                <td>模板内容</td>
+                <td><p id="content"></p></td>
+            </tr>
+            <tr>
+                <td>模板示例</td>
+                <td><p id="example"></p></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    render(function (data, method) {
+        $(function () {
+            $("#mid").val(data.id);
+            $.ajax({
+                type: "get",
+                url: parent.$.modalDialog.path + data.id,
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    $("#template_id").text(result.template_id);
+                    $("#title").text(result.title);
+                    $("#primary_industry").text(result.primary_industry);
+                    $("#content").text(result.content);
+                    $("#example").text(result.example);
+                }
+            });
+        });
+    });
+</script>

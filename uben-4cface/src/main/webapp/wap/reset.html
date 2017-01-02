@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>井下作业修井工具数据库系统</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+</head>
+<body>
+<div class="page-group" id="page">
+    <div class="page" id='find'>
+        <header class="bar bar-nav">
+            <h1 class='title'>找回密码</h1>
+        </header>
+        <div class="content">
+  <div class="list-block">
+    <ul>
+      <li>
+        <div class="item-content">
+          <div class="item-media"><i class="icon icon-form-password"></i></div>
+          <div class="item-inner">
+            <div class="item-title label">密码</div>
+            <div class="item-input">
+              <input type="password" placeholder="" class="" id="password" name="password">
+            </div>
+          </div>
+        </div>
+      </li>
+       <li>
+        <div class="item-content">
+          <div class="item-media"><i class="icon icon-form-password"></i></div>
+          <div class="item-inner">
+            <div class="item-title label">确认密码</div>
+            <div class="item-input">
+              <input type="password" placeholder="" class="" id="passwords" name="password">
+            </div>
+          </div>
+        </div>
+      </li>
+     
+      
+    </ul>
+  </div>
+  <div class="content-block">
+    <div class="row">
+      <div class="col-50"><a href="#" class="button button-big button-fill button-danger">取消</a></div>
+      <div class="col-50"><a href="#" id="submit" class="button button-big button-fill button-success">提交</a></div>
+    </div>
+  </div>
+</div>
+    </div>
+</div>
+
+<!-- popup, panel 等放在这里 -->
+<div class="panel-overlay"></div>
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='js/lib/vue.min.js' charset='utf-8'></script>
+<script type="text/javascript">
+    $("#submit").click(function(){
+        if(!$("#password").val() || $("#password").val() == ''){
+            $.toast("请输入密码", 2000);
+            return;
+        }
+        if(!$("#passwords").val() || $("#passwords").val() == ''){
+            $.toast("请再次输入密码", 2000);
+            return;
+        }
+        if($("#password").val()!=$("#passwords").val()){
+            $.toast("两次输入的密码不一致", 2000);
+            return;
+        }
+        var password = $('#password').val();
+        var url = decodeURI(window.location.href);
+        var ver = url.indexOf("?") != -1 ? url.split("?")[1] : undefined;
+        $.ajax({
+            type: "get",
+            url: "../passWord/reset?password="+ password+"&verification="+ver,
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                console.info(result);
+                window.location.href="user.html";
+            }
+        });
+
+    })
+</script>
+<style>
+    .warning {
+        color: #E64340;
+    }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties>
+		<property name="dialect" value="mysql" />
+		<property name="pageSqlId" value=".*Page$" />
+	</properties>
+	<settings>
+		<!-- 
+			Valid values are SLF4J, LOG4J, JDK_LOGGING, COMMONS_LOGGING,
+			STDOUT_LOGGING, NO_LOGGING or a full qualified class name that implements
+			org.apache.ibatis.logging.Log and gets an string as a constructor parameter.
+		 -->
+		<setting name="logImpl" value="SLF4J"/>
+	</settings>
+	<!--  
+	<typeHandlers>
+		<typeHandler javaType="string" jdbcType="DATE"
+			handler="com.zte.ismp.common.mybatis.typehandler.DateTypeHandler" />
+		<typeHandler javaType="string" jdbcType="TIMESTAMP"
+			handler="com.zte.ismp.common.mybatis.typehandler.TimestampTypeHanlder" />
+	</typeHandlers>
+	 
+	-->
+	<typeAliases>
+		<typeAlias type="xyz.uben.common.infra.mybatis.MyBatisOGNL" alias="MyBatisOGNL" />
+	</typeAliases>
+
+	<plugins>
+	    <plugin interceptor="xyz.uben.common.infra.mybatis.cache.CacheInterceptor"></plugin>
+		<plugin interceptor="xyz.uben.common.infra.mybatis.page.PageInterceptor"></plugin>
+		<plugin interceptor="xyz.uben.common.infra.mybatis.mapper.AutoMapperInterceptor"></plugin>
+	</plugins>
+
+</configuration>   

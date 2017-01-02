@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../style/main.css"/>
+
+    <title></title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'center',border:false">
+
+    <table id="dataGrid" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'title',sortable:true,width:200">标题</th>
+            <th data-options="field:'abstracts',sortable:true,width:1000">摘要</th>
+            <th data-options="field:'action',width:150,align:'center'" formatter="showaction">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+<div id="toolbar" style="display: none;">
+    <a resource="add" onclick="gotoCases('添加案例','cases/cases.html',null,refresh,null,'add');"
+       href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-add'">添加</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="edit" onclick="gotoCases('修改案例','cases/cases.html',null,refresh,null,'edit');"
+       href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-edit'">修改</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="delete" onclick="del(null,'delete');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">删除</a>
+    <span class="datagrid-btn-separator"></span>
+</div>
+<script type="text/javascript" src="../js/loader.js"></script>
+<script type="text/javascript">
+    var dictionarytypeTree;
+    loader.load('common', function () {
+        $(function () {
+            $("#dataGrid").datagrid({
+                toolbar: "#toolbar",
+                url:"dataGrid",
+                remoteSort: true,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagination: true,
+                pagePosition: "bottom",
+                pageList: [50, 100, 200, 500],
+                pageSize: 100,
+                singleSelect: "true",
+                onDblClickRow: function (rowindex, rowdata) {
+                    if (isPermit("edit")) {
+                        gotoCases('修改案例', 'cases/cases.html', null, refresh, rowdata.mid, 'edit');
+                    }
+                },
+                onBeforeLoad: function (param) {
+                    param["pageSize"] = param.rows;
+                    param["currentPage"] = param.page;
+                    delete param.rows;
+                    delete param.page;
+
+                }
+            });
+
+            $("#toolbar").find("a").each(function () {
+                var resource = $(this).attr("resource");
+                if (!isPermit(resource)) {
+                    $(this).hide();
+                    $(this).next().remove();
+                }
+            });
+        });
+    });
+    function gotoCases(title, url, iconCls, refresh, mid, tag) {
+        parent.window.refresh = refresh;
+        if (tag == 'edit') {
+            if (mid == null) {
+                var rows = $('#dataGrid').datagrid('getSelections');
+                if (rows == '') {
+                    $.messager.alert('提示', '请选择您要编辑的项', 'info');
+                    return;
+                }
+                mid = rows[0].mid;
+            }
+            $.ajax({
+                type: "get",
+                url: "get/" + mid,
+                dataType: "json",
+                cache: false,
+                success: function (result) {
+                    parent.window.datas = result;
+                    parent.window.addTab({title: title, url: url, iconCls: iconCls});
+                }
+            });
+        }
+        else{
+            parent.window.datas = null;
+            parent.window.addTab({title: title, url: url, iconCls: iconCls});
+        }
+    }
+    window.showaction = function (value, row, index) {
+        var object = {};
+        object["select"] = {"func": "groupFun", "paramid": row.mid, "name": "预览"};
+        return pubAction(object);
+    }
+    window.groupFun = function (param) {
+        window.open(store.get("context") + "/caseInfo.html?id=" + param);
+    }
+  /*  window.groupFun = function (param) {
+//        var saveButton = {
+//            text: '提交',
+//            iconCls: 'icon-ok',
+//            handler: function () {
+//                var f = parent.$.modalDialog.handler.find('#form');
+//                f.submit();
+//            }
+//        };
+        var data = {
+            id: param
+        };
+        pop("casesView.html", "预览", 800, 500, null, data);
+    }*/
+
+    function refresh() {
+        $("#dataGrid").datagrid("reload");
+    }
+</script>
+</body>
+</html>

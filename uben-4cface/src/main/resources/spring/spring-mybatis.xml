@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	
+	<!-- 集成mybatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/mybatis/mybatis-config.xml" />
+	</bean>
+	
+     <!--通过模板定制mybatis的行为 -->
+	 <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">   
+	    <constructor-arg index="0" ref="sqlSessionFactory" />
+	    <!--更新采用批量模式
+	    <constructor-arg index="1" value="BATCH"/>
+	    -->
+     </bean>
+     
+	<!-- 采用自动扫描方式创建mapper bean -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="xyz.uben.**.persistent" />
+		<property name="sqlSessionTemplateBeanName" value="sqlSessionTemplate" />
+        <property name="annotationClass" value="xyz.uben.common.infra.mybatis.mapper.annotation.SimpleMapper" />
+	</bean>
+</beans>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>井下作业修井工具数据库系统</title>
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+	<link rel="shortcut icon" href="/favicon.ico">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+	<link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+</head>
+<body>
+<!-- page集合的容器，里面放多个平行的.page，其他.page作为内联页面由路由控制展示 -->
+<div class="page-group" id="page">
+	<!-- 单个page ,第一个.page默认被展示-->
+	<div class="page page-current" id="tools">
+		<header class="bar bar-nav">
+			<h1 class='title'>工具库存</h1>
+		</header>
+		<div class="bar bar-header-secondary">
+			<div class="searchbar">
+				<a class="searchbar-cancel">取消</a>
+				<div class="search-input">
+					<label class="icon icon-search" for="search"></label>
+					<input type="search" id='search' placeholder='输入您想查找的工具名称...' v-model="question"/>
+				</div>
+			</div>
+		</div>
+		<!-- 页面内容区 -->
+		<div class="content infinite-scroll infinite-scroll-bottom" @infinite="more" data-distance="100">
+			<div class="content-block" v-show="noAnswer"><p>{{tips}}</p></div>
+			<div class="list-block media-list">
+				<ul>
+					<li v-for="tool in tools" @click="showTool(tool)">
+						<a href="#tool" class="item-link item-content">
+							<div class="item-inner">
+								<div class="item-title-row">
+									<div class="item-title">{{tool.toolName}}</div>
+									<div class="item-after">{{tool.state==0?'出库':'在库'}}</div>
+								</div>
+							</div>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- 加载提示符 -->
+			<div class="infinite-scroll-preloader" v-show="loading">
+				<div class="preloader"></div>
+			</div>
+		</div>
+	</div>
+	<div class="page" id="tool">
+		<header class="bar bar-nav">
+			<a class="button button-link button-nav pull-left" href="#tools">
+				<span class="icon icon-left"></span>
+				返回
+			</a>
+			<h1 class='title'>{{tool.toolName}}</h1>
+		</header>
+		<!-- 页面内容区 -->
+		<div class="content">
+			<div class="list-block">
+				<ul>
+					<li class="item-content">
+						<!--<div class="item-media"><i class="icon icon-f7"></i></div>-->
+						<div class="item-inner">
+							<div class="item-title">存放仓库</div>
+							<div class="item-after">{{tool.warName}}</div>
+						</div>
+					</li>
+					<li class="item-content">
+						<!--<div class="item-media"><i class="icon icon-f7"></i></div>-->
+						<div class="item-inner">
+							<div class="item-title">状态</div>
+							<div class="item-after">{{tool.state==0?'出库':'在库'}}</div>
+						</div>
+					</li>
+					<li class="item-content">
+						<!--<div class="item-media"><i class="icon icon-f7"></i></div>-->
+						<div class="item-inner">
+							<div class="item-title">厂家</div>
+							<div class="item-after">{{tool.manufactor}}</div>
+						</div>
+					</li>
+					<li class="item-content">
+						<!--<div class="item-media"><i class="icon icon-f7"></i></div>-->
+						<div class="item-inner">
+							<div class="item-title">参考价格</div>
+							<div class="item-after">{{tool.price}}</div>
+						</div>
+					</li>
+					<li class="item-content">
+						<!--<div class="item-media"><i class="icon icon-f7"></i></div>-->
+						<div class="item-inner">
+							<div class="item-title">参考时间</div>
+							<div class="item-after">{{tool.time}}</div>
+						</div>
+					</li>
+					<li class="item-content">
+						<!--<div class="item-media"><i class="icon icon-f7"></i></div>-->
+						<div class="item-inner">
+							<div class="item-title">备注</div>
+							<div class="item-after">{{tool.remark}}</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- popup, panel 等放在这里 -->
+<div class="panel-overlay"></div>
+
+
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='js/lib/vue.min.js' charset='utf-8'></script>
+<script type='text/javascript' src="js/lib/lodash.min.js"></script>
+<script>
+    $(function(){
+        var vm = pageVM;
+        $.ajax({
+            type: 'GET',
+            url: '../toolInformation/dataGrid',
+            data: {currentPage: vm.page.currentPage, pageSize: vm.page.pageSize},
+            timeout: 3000,
+			dataType: "json",
+            success: function (response) {
+                if (response && response.total > 0) {
+                    for (var i = 0; i < response.rows.length; i++) {
+                        vm.tools.push(response.rows[i]);
+                    }
+                } else {
+                    vm.tips = '未搜索到任何工具,请换个名称搜索';
+                }
+            },
+            error: function (xhr, type) {
+                $.toast("出错了,请稍候再试", 2000);
+            }
+        })
+    });
+
+	var pageVM = new Vue({
+		el: '#page',
+		data: {
+			tips: "",
+			question: '',
+			page: {currentPage: 1, pageSize: 10},
+			tools: [],
+			tool: {},
+			// 加载flag
+			loading: false,
+		},
+		computed: {
+			// 一个计算属性的 getter
+			noAnswer: function () {
+				return this.tools.length == 0;
+			}
+		},
+		watch: {
+			// whenever question changes, this function will run
+			question: function (newQuestion) {
+				this.tools = [];
+				this.tips = '等待输入结束...';
+				this.getAnswer();
+			}
+		},
+		methods: {
+			showTool:function (tool) {
+				this.tool=tool;
+			},
+			getAnswer: _.debounce(
+					function () {
+						var vm = this;
+                        pageVM.page.currentPage = 1;
+						vm.tips = '搜索中...';
+						$.ajax({
+							type: 'GET',
+							url: '../toolInformation/dataGrid',
+							data: {key: vm.question, currentPage: vm.page.currentPage, pageSize: vm.page.pageSize},
+							timeout: 3000,
+							dataType: "json",
+							success: function (response) {
+								if (response && response.total > 0) {
+									for (var i = 0; i < response.rows.length; i++) {
+										vm.tools.push(response.rows[i]);
+									}
+								} else {
+									vm.tips = '未搜索到任何工具,请换个名称搜索';
+								}
+							},
+							error: function (xhr, type) {
+								$.toast("出错了,请稍候再试", 2000);
+							}
+						})
+					},
+					1000
+			),
+			more: function () {
+				// 如果正在加载，则退出
+				if (this.loading) return;
+				// 设置flag
+				this.loading = true;
+				var vm = this;
+				vm.page.currentPage++;
+				$.ajax({
+					type: 'GET',
+					url: '../toolInformation/dataGrid',
+					data: {key: vm.question, currentPage: vm.page.currentPage, pageSize: vm.page.pageSize},
+					timeout: 3000,
+					dataType: "json",
+					success: function (response) {
+						vm.loading = false;
+						if (response && response.total > 0) {
+							for (var i = 0; i < response.rows.length; i++) {
+								vm.tools.push(response.rows[i]);
+							}
+							//容器发生改变,如果是js滚动，需要刷新滚动
+							$.refreshScroller();
+						} else {
+							$.toast("已加载到最后", 2000);
+							// 加载完毕，则注销无限加载事件，以防不必要的加载
+							$.detachInfiniteScroll($('.infinite-scroll'));
+							// 删除加载提示符
+							$('.infinite-scroll-preloader').remove();
+							return;
+						}
+					},
+					error: function (xhr, type) {
+						vm.loading = false;
+						$.toast("出错了,请稍候再试", 2000);
+					}
+				});
+			}
+		}
+	});
+	<!-- 默认必须要执行$.init(),实际业务里一般不会在HTML文档里执行，通常是在业务页面代码的最后执行 -->
+	$.init();
+</script>
+
+</body>
+</html>

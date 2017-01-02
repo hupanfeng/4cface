@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+
+    <title>用户管理</title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'north',border:false" class="editBox-inputs">
+    <form id="searchForm" style="line-height: 40px">
+        <span class="datagrid-btn-separator"></span>
+        <strong style="margin-right: 5px">公众号:</strong><input name="appName" placeholder="请输入公众号" class="easyui-textbox" style="height:28px"/>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" style="padding: 0 20px;"
+           data-options="iconCls:'icon_search'" onclick="ubenSearch();">查询</a>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_cancel',plain:true"
+           onclick="ubenClean();">清空</a>
+    </form>
+</div>
+<div data-options="region:'center',border:false">
+    <table id="dataGrid" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'appName',sortable:true,align:'center',width:180">公众号</th>
+            <th data-options="field:'appid',sortable:true,align:'center',width:180">appid</th>
+            <th data-options="field:'secret',sortable:true,align:'center',width:300">secret</th>
+            <th data-options="field:'token',sortable:true,align:'center',width:150">token</th>
+            <th data-options="field:'type',align:'center',width:100" formatter="showType">类型</th>
+            <th data-options="field:'status',align:'center',width:100" formatter="showState">状态</th>
+            <th data-options="field:'cusStatus',align:'center',width:100" formatter="showState">客服状态</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<div id="toolbar" style="display: none;">
+    <a resource="add" onclick="add('app.html','公众号');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-add'">添加</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="edit" onclick="edit(null,'app.html','公众号');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-edit'">修改</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="delete" onclick="del(null,'delete');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">删除</a>
+</div>
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    loader.load('common', function () {
+        $(function () {
+            $("#dataGrid").datagrid({
+                toolbar: "#toolbar",
+                url: "dataGrid",
+                remoteSort: true,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagination: true,
+                pagePosition: "bottom",
+                pageList: [50, 100, 200, 500],
+                pageSize: 100,
+                singleSelect: "true",
+                onDblClickRow: function (rowindex, rowdata) {
+                    if (isPermit("edit")) {
+                        edit(rowdata.mid, 'app.html', '公众号');
+                    }
+                },
+                onBeforeLoad: function (param) {
+                    param["pageSize"] = param.rows;
+                    param["currentPage"] = param.page;
+                    delete param.rows;
+                    delete param.page;
+                }
+            });
+
+            $("#toolbar").find("a").each(function () {
+                var resource = $(this).attr("resource");
+                if (!isPermit(resource)) {
+                    $(this).hide();
+                    $(this).next().remove();
+                }
+            });
+        });
+    });
+
+    function refresh(){
+        $("#dataGrid").datagrid('reload');
+    }
+
+    function showType(value, row, index) {
+        switch (value) {
+            case 1:
+                return "订阅号";
+            case 2:
+                return "服务号";
+            case 3:
+                return "企业号";
+            default:
+                return "未知"
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<script type="text/javascript">
+    render(function (data, method) {
+        var porg = "";
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            $("#pLevelCode").val(data.pLevelCode);
+            $("#orgPid").val(data.orgPid);
+            if (!data.orgPid && data.orgPid == 0) {
+                porg = "";
+            } else {
+                porg = data.orgPid;
+            }
+        } else {
+            $("#mid").attr("disabled", "disabled");
+        }
+        $.ajax({
+            type: "get",
+            url: parent.$.modalDialog.path + "dataGrid",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.orgName;
+                    treeNode.state = "open";
+                    treeNode.pid = it.orgPid;
+                    treeNode.levelCode = it.levelCode;
+                    tree.push(treeNode);
+                });
+                $("#orgPid").combotree({
+                    parentField: "pid",
+                    data: tree,
+                    value: porg,
+                    onSelect: function (newValue) {
+                        $("#pLevelCode").val(newValue.levelCode);
+                    }
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.refresh();//之所以能在这里调用到parent.$.modalDialog.openner_dataGrid这个对象，是因为user.jsp页面预定义好了
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input name="mid" id="mid" type="hidden"/>
+            <table class="grid">
+                <tr style="height:40px">
+                    <td>编&nbsp;&nbsp;号</td>
+                    <td><input name="orgNo" class="easyui-textbox" placeholder="请输入组织编号" style="width:200px;height:28px"></td>
+                    <td>组织名称</td>
+                    <td><input name="orgName" class="easyui-textbox" placeholder="请输入组织名称" style="width:200px;height:28px"
+                               data-options="required:true"></td>
+                </tr>
+                <tr style="height:40px">
+                    <td>组织描述</td>
+                    <td><input name="orgDesc" class="easyui-textbox" style="width:200px;height:28px"></td>
+                    <td>状&nbsp;&nbsp;态</td>
+                    <td>
+                        <select class="easyui-combobox" name="orgStatus"
+                                data-options="width:200,editable:false,panelHeight:'auto'" style="height:28px">
+                            <option value="0">停用</option>
+                            <option value="1" selected="selected">正常</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>上级组织</td>
+                    <td colspan="3">
+                        <input id="pLevelCode" name="pLevelCode" type="hidden"/>
+                        <input id="orgPid" name="orgPid" style="width: 520px; height:28px"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;"
+                           onclick="$('#orgPid').combotree('clear');">清空 </a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.uben._4cface.infra.persistent.category.CategoryMapper">
+    <resultMap id="BaseResultMap" type="xyz.uben._4cface.domain.model.Category">
+        <id column="mid" property="mid" jdbcType="BIGINT"/>
+        <result column="categoryName" property="categoryName" jdbcType="VARCHAR"/>
+        <result column="pid" property="pid" jdbcType="BIGINT"/>
+        <result column="orderNum" property="orderNum" jdbcType="INTEGER"/>
+        <result column="levelCode" property="levelCode" jdbcType="VARCHAR"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="createUserId" property="createUserId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+
+    </sql>
+
+    <delete id="delete"/>
+    <delete id="deleteRole">
+       delete from tkb_category_role where categoryId = #{categoryId,jdbcType=DECIMAL}
+    </delete>
+    <delete id="deleteOrg">
+       delete from tkb_category_org where categoryId = #{categoryId,jdbcType=DECIMAL}
+    </delete>
+    <delete id="deleteCategory">
+        delete from tkb_category where pid = #{pid,jdbcType=DECIMAL}
+    </delete>
+
+
+    <insert id="insert"/>
+    <insert id="insertRole">
+        insert into tkb_category_role(categoryId,roleId) values(#{categoryId,jdbcType=DECIMAL},#{roleId,jdbcType=DECIMAL})
+    </insert>
+    <insert id="insertOrg">
+         insert into tkb_category_org(categoryId,orgId,orgLevelCode) values(#{categoryId,jdbcType=DECIMAL},#{orgId,jdbcType=DECIMAL},#{orgLevelCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update"/>
+
+    <select id="select" resultMap="BaseResultMap"/>
+
+    <select id="queryByPage" resultMap="BaseResultMap">
+        select * from tkb_category
+    </select>
+    <select id="query" resultMap="BaseResultMap">
+        select * from tkb_category where categoryName =#{categoryName,jdbcType=VARCHAR}
+    </select>
+    <select id="queryCategoryId" resultType="Long">
+        select distinct categoryId from tkb_category_role where roleId=#{roleId,jdbcType=DECIMAL}
+    </select>
+    <select id="queryOrgCategoryId" resultType="Long">
+        select distinct categoryId from tkb_category_org where orgId=#{orgId,jdbcType=DECIMAL}
+    </select>
+    <select id="queryCategory" resultMap="BaseResultMap">
+         select * from tkb_category where mid=#{mid,jdbcType=DECIMAL}
+    </select>
+    <select id="queryRole" resultType="Long">
+        select roleId from tkb_category_role where categoryId=#{categoryId,jdbcType=DECIMAL}
+    </select>
+    <select id="queryOrg" resultType="Long">
+        select orgId from tkb_category_org where categoryId=#{categoryId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteRoleCategory">
+        DELETE
+        FROM
+        tkb_category_role
+        WHERE
+        roleId in
+        <foreach collection="roles" index="index" item="it" open="(" separator="," close=")">
+            #{it.mid,jdbcType = BIGINT}
+        </foreach>
+    </delete>
+    <select id="queryAll" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        tkb_category
+        <where>
+            <if test="levelCodes != null and levelCodes.size() > 0">
+                <foreach collection="levelCodes" index="index" item="it" separator=" or ">
+                    levelCode like #{it,jdbcType=VARCHAR}"%"
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="queryByPid" resultMap="BaseResultMap">
+          select * from tkb_category where pid=#{pid,jdbcType=DECIMAL}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+         select * from tkb_category
+    </select>
+    <select id="queryByLevelCode" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+            tkb_category
+        WHERE
+            levelCode = #{levelCode,jdbcType = VARCHAR}
+    </select>
+    <select id="queryByOrgLevelCode" resultMap="BaseResultMap">
+         SELECT
+	      *
+         FROM
+	       tkb_category
+         WHERE
+	    mid IN (
+		SELECT
+			categoryId
+		FROM
+			tkb_category_org
+		WHERE
+			orgLevelCode LIKE #{orgLevelCode,jdbcType = VARCHAR}"%"
+	)
+    </select>
+
+    <update id="updateCategoryOrgbyLevelCode">
+   UPDATE tkb_category_org
+    SET orgLevelCode = #{levelCode,jdbcType = VARCHAR}
+    WHERE
+        orgId = #{orgId , jdbcType = BIGINT}
+    </update>
+
+    <delete id="deleteCategoryOrgbyLevelCode">
+    DELETE
+    FROM
+        tkb_category_org
+    WHERE
+        orgLevelCode LIKE #{levelCode , jdbcType = VARCHAR}"%"
+    </delete>
+</mapper>

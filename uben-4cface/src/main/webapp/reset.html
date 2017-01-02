@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="./style/images/index/favicon.png"/>
+    <link rel="stylesheet" href="style/base.css"/>
+    <link rel="stylesheet" href="style/public.css" />
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+    <style>
+		body {
+			width: 100%;
+			height: 100%;
+			font-size: 14px;
+			font-family: 'Microsoft YaHei';
+			background: url(style/images/bgimg2.jpg) no-repeat center;
+			margin: 0 auto;
+			background-size:100%;
+		}
+		body{
+			filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='style/images/bgimg2.jpg', sizingMethod='scale')\9;
+		}
+		body img {
+			width: 100%;
+			height: 100%;
+			margin: 0 auto;
+			background-size:100%;
+		}
+    </style>
+</head>
+<body>
+
+
+
+<div class="content1" id="bg">
+	<div class="login_con_box">
+		<div class="login_con">
+			<div class="findPwd_tit">
+				<span>重置密码</span>
+			</div>
+			<div class="pass_form">
+
+					<div class="pass_form_item">
+						<p class="fl_label">
+							<label for="">密	码:</label>
+						</p>
+						<p class="fl_input">
+							<input type="password" placeholder="请输入密码" id="pass_form_items"/>
+							<span class="span_item_tel"></span>
+						</p>
+					</div>
+					<div class="pass_form_item">
+						<p class="fl_label">
+							<label for="">确认密码:</label>
+						</p>
+						<p class="fl_input">
+							<input type="password" placeholder="请输入密码" id="pass_item_phone"/>
+							<span class=""></span>
+						</p>
+					</div>
+					<div class="pass_form_item">
+						<input type="submit" value="提	交" class="submit_next"/>
+					</div>
+
+			</div>
+		</div> 
+    </div>
+</div>
+<script src="js/jquery-1.12.4.js"></script>
+<script type="text/javascript" src="./js/loader.js"></script>
+<script type="text/javascript">
+	$('#pass_form_items').bind('blur',function(){
+		var phonese = $('#pass_form_items');
+		if(phonese.val()==''){
+			$('.span_item_tel').addClass('pass-item-error').html('请输入您的密码');
+			return false;
+		}
+	})
+	$('#pass_item_phone').bind('blur',function(){
+		var phone = $('#pass_item_phone');
+		var phones = $('#pass_form_items');
+		if(phone.val()==''){
+			$('.span_item_tel').addClass('pass-item-error').html('请再次输入您的密码');
+			return false;
+		}
+		if(phone.val()!=phones.val()){
+			$('.span_item_tel').addClass('pass-item-error').html('两次密码输入不一样');
+		}else{
+			$('.span_item_tel').addClass('pass-item-succ').html('正确');
+		}
+	})
+	$(".submit_next").click(function(){
+		var password=$('#pass_form_items').val();
+		var url = decodeURI(window.location.href);
+		var ver = url.indexOf("?") != -1 ? url.split("?")[1] : undefined;
+		$.ajax({
+			type: "get",
+			url: "passWord/reset?password="+ password+"&verification="+ver,
+			cache: false,
+			dataType: "json",
+			success: function (result) {
+				window.location.href="login.html";
+			}
+		});
+	})
+
+	$(function(){
+		$('#bg').height($(window).height());
+		$('#bg').width($(window).width());
+	});
+
+</script>
+</body>
+</html>

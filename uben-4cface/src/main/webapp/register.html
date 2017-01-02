@@ -1,0 +1,124 @@
+<!DOCTYPE html>s
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="style/wb.css">
+    <link rel="stylesheet" type="text/css" href="style/main.css"/>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+</head>
+<body>
+<div id="retrievePassword" class="easyui-dialog" title="注册账户" style="width:300px;height:500px;"
+     data-options="iconCls:'icon-save',resizable:true,modal:true,closable:true">
+    <form id="form" method="post">
+    <table>
+        <tr>
+            <td>登录名</td>
+            <td>
+                <input name="loginname" placeholder="请输入登录名称" class="easyui-textbox"
+                       data-options="required:true,validType:'length[2,16]'" value="">
+            </td>
+        <tr>
+            <td>密码</td>
+            <td> <input id="password" name="password" validType="length[4,32]" class="easyui-textbox" required="true" type="password" value=""/></td>
+
+        </tr>
+        <tr>
+            <td>再次确认密码</td>
+            <td><input type="password" name="repassword" id="repassword" required="true" class="easyui-textbox"  validType="equalTo['#password']" invalidMessage="两次输入密码不匹配"/></td>
+        </tr>
+
+        </tr>
+        <tr>
+            <td>姓名</td>
+            <td>
+                <input name="name" type="text" placeholder="请输入姓名" class="easyui-textbox"
+                       data-options="required:true,validType:'length[2,16]'" value="">
+            </td>
+            </tr>
+             <tr>
+            <td>员工号</td>
+            <td>
+                <input id="userNo" placeholder="请输入员工号" name="userNo" class="easyui-textbox"/>
+            </td>
+        </tr>
+        <tr>
+            <td>手机</td>
+            <td>
+                <input id="mobile" class="easyui-textbox" name="mobile"
+                       data-options="validType:'length[11,11]',required:true"/>
+            </td>
+            </tr>
+                <tr>
+                <td>验证码</td>
+                <td><input id="verification" name="verification" class=" easyui-textbox" required="true" invalidMessage="必需填写"/></td>
+              </tr>
+            <tr>
+            <td>邮箱</td>
+            <td>
+                <input class="easyui-textbox" id="email" type="text" name="email"
+                       data-options="validType:'email'"/>
+            </td>
+        </tr>
+
+    </table>
+    </form>
+</div>
+<script type="text/javascript" src="js/loader.js"></script>
+<script type="text/javascript">
+    loader.load('common', function (){
+        $.extend($.fn.validatebox.defaults.rules, {
+            /*必须和某个字段相等*/
+            equalTo: { validator: function (value, param) { return $(param[0]).val() == value; }, message: '字段不匹配' }
+        });
+        $(function () {
+            $("#form").form({
+                url: "register/add",
+                success: function (result) {
+                }
+            });
+            var retrievePassword=$('#retrievePassword').dialog({
+                modal:true,
+                buttons:[
+                    {
+                    text:'发送验证码',
+                    handler:function () {
+                        var mo = $('#mobile').val();
+                        store.set("mo",mo);
+                        $.ajax({
+                            type: "get",
+                            url: "register/random?mobile="+ mo,
+                            cache: false,
+                            success: function (result) {
+                                var time = 60;
+                                var i = setInterval(function(){
+                                    time-- ;
+                                    $("#time").html(time)
+                                    if(time == 0){
+                                        $("#time").hide();
+                                        clearInterval(i);
+                                    }
+                                },1000);
+                            }
+                        });
+                    }}, {
+                        text:'提交',
+                        handler:function () {
+                            $("#form").submit();
+                        }
+                    }
+                ]
+            });
+
+        })
+
+    })
+</script>
+</body>
+</html>

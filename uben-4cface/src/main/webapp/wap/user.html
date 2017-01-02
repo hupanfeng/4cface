@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>井下作业修井工具数据库系统</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+    <style>
+        .tab-item-psd {
+            float: left;
+        }
+
+        .tab-item-zh {
+            float: right;
+        }
+
+        .content-block {
+            width: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div class="page-group" id="page">
+    <div class="page page-current" id="user">
+        <header class="bar bar-nav">
+            <a class="icon icon-refresh pull-right" href="javascript:void refresh()"></a>
+            <h1 class='title'>用户中心</h1>
+        </header>
+        <div class="content">
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-me"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title">姓名</div>
+                                <div class="item-after">
+                                    {{user.userName}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-emoji"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title">昵称</div>
+                                <div class="item-after">
+                                    {{user.nickname}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-phone"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title">手机</div>
+                                <div class="item-after">
+                                    {{user.mobile}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-browser"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title">邮箱</div>
+                                <div class="item-after">
+                                    {{user.email}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Date -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon icon-clock"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title">关注时间</div>
+                                <div class="item-after">
+                                    {{user.subscribeTime}}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <!--<div class="col-50">-->
+                <!--<a href="javascript:void(0);" @click="unbind"-->
+                <!--class="button button-big button-fill button-danger">解除绑定</a></div>-->
+                <!--</div>-->
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <div class="col-50">
+                        <a href="JavaScript:WeixinJSBridge.call('closeWindow')" id="cancelUnbind"
+                           class="button button-big button-fill button-danger">取消</a>
+                    </div>
+                    <div class="col-50">
+                        <a href="#" @click="unbind" class="button button-big button-fill button-success">解除绑定</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" id='bind'>
+        <header class="bar bar-nav">
+            <h1 class='title'>绑定系统帐号</h1>
+        </header>
+        <div class="content">
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title label warning">手机</div>
+                                <div class="item-input" v-show="principals || !validate">
+                                    <input id="mobile" type="text" v-model="principals" placeholder="请填写手机号">
+                                </div>
+                                <div class="item-input" v-show="!principals && validate">
+                                    <span class="warning">请填写手机号</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-content">
+                            <div class="item-media"><i class="icon"></i></div>
+                            <div class="item-inner">
+                                <div class="item-title label warning">密码</div>
+                                <div class="item-input" v-show="password || !validate">
+                                    <input id="password" type="password" v-model="password" placeholder="请填写密码">
+                                </div>
+                                <div class="item-input" v-show="!password && validate">
+                                    <span class="warning">请填写密码</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block">
+                <a class="tab-item-psd " onclick="findpwd()">忘记密码?</a>
+                <a class="tab-item-zh " href="register.html">没有帐号?</a>
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <div class="col-50"><a href="#" class="button button-big button-fill button-danger">取消</a></div>
+                    <div class="col-50"><a href="#" @click="submit"
+                                           class="button button-big button-fill button-success">提交</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='js/lib/vue.min.js' charset='utf-8'></script>
+<script>
+    $(function () {
+        $.ajax({
+            type: 'GET',
+            url: '../wx/fan/get',
+            timeout: 3000,
+            dataType: "json",
+            success: function (response) {
+                if (response) {
+                    pageVM.user = response;
+//                        $("#user").addClass("page-current");
+//                        $("#bind").removeClass("page-current");
+                } else {
+                    //$("#user").removeClass("page-current");
+                    //$("#bind").addClass("page-current");
+                    $.toast("您还未绑定系统帐号,请先绑定", 1000);
+                    $.router.load("#bind");
+                }
+
+            },
+            error: function (xhr, type) {
+                $.toast("您还未绑定系统帐号,请先绑定", 1000);
+                $.router.load("#bind");
+            }
+        });
+    });
+    var pageVM = new Vue({
+        el: '#page',
+        data: {
+            user: {userName: "", nickName: "", mobile: "", email: "", subscribeTime: ""},
+            principals: "",
+            password: "",
+            validate: false
+        },
+        methods: {
+            submit: function () {
+                var vm = this;
+                if (!this.principals) {
+                    this.validate = true;
+                }
+                if (!this.password) {
+                    this.validate = true;
+                }
+                else {
+                    $.ajax({
+                        type: 'post',
+                        url: '../wx/fan/bind',
+                        data: {principals: vm.principals, password: vm.password},
+                        timeout: 5000,
+                        dataType: "json",
+                        success: function (response) {
+                            if (response && response.success) {
+                                vm.user = response.obj;
+                                $.toast("绑定成功", 2000);
+//                                        $("#user").addClass("page-current");
+//                                        $("#bind").removeClass("page-current");
+                                $.router.load("#user");
+                            } else {
+                                $.toast("绑定失败:" + response.msg, 2000);
+//                                        $("#user").removeClass("page-current");
+//                                        $("#bind").addClass("page-current");
+                                $.router.load("#bind");
+                            }
+                        },
+                        error: function (xhr, type) {
+                            $.toast("出错了,请稍候再试", 2000);
+                        }
+                    })
+                }
+
+                setTimeout(function () {
+                    vm.validate = false;
+                }, 1000);
+            },
+            unbind: function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '../wx/fan/unbind',
+                    timeout: 3000,
+                    dataType: "json",
+                    success: function (response) {
+                        if (response && response.success) {
+                            $.toast("解除绑定成功");
+                            $("#cancelUnbind").click();
+                        } else {
+                            $.toast("解除绑定失败:" + response.msg);
+                        }
+                    },
+                    error: function (xhr, type) {
+                        $.toast("解除绑定失败");
+                    }
+                })
+            }
+        }
+    });
+
+    function refresh() {
+        window.location.reload(true);
+    }
+
+    function findpwd() {
+        window.location.href = "findPassword.html";
+    }
+    $.init();
+</script>
+<style>
+    .warning {
+        color: #E64340;
+    }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+@charset "utf-8";
+/* 
+***基础类 公共调用用于全站
+***
+*/
+/*---基本元素初始化---*/
+body,h1,h2,h3,h4,h5,h6,hr,p,pre,blockquote,dl,dd,ul,ol,th,td,form,fieldset,legend,button,input,textarea,menu,li{margin:0;padding:0}
+body {font:14px/1.5 "Microsoft YaHei",tahoma,arial,'Hiragino Sans GB','\5b8b\4f53',sans-serif;color:#666;background:#fff;-webkit-text-size-adjust:none;}
+h1,h2,h3,h4,h5,h6,button,input,textare{font-size:100%}
+fieldset,img{border:0;}
+table{border-collapse:collapse;border-spacing:0}
+caption,th{text-align:left}
+li{list-style:none}
+address,cite,code,dfn,var,em,th{font-style:normal;font-weight:normal}
+button,input,textarea{outline:none;font-family:inherit}:focus{outline:none;}
+
+/*---基本元素初始化结束---*/
+
+
+/*---网页基本宽度定义---*/
+.clr{clear: both;}
+.wrap{margin-right:auto;margin-left:auto;width:1320px;}
+
+
+.wamp{-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;padding-left:15px;padding-right: 15px;}
+/*---网页基本宽度定义结束---*/
+
+/*---位置定位定义---*/
+.fl {float:left;}
+.fr {float:right;}
+.tl {text-align:left;}
+.tc {text-align:center;}
+.tr {text-align:right;}
+/*---位置定位结束---*/
+
+
+/*---链接、次级信息、字体加粗、字体颜色定义---*/
+a {text-decoration:none;color:#666;}
+/*a:visited{color:#741274}*/
+
+
+/*---链接、次级信息、字体加粗、字体颜色定义结束---  还差蓝色  */
+
+
+.table{display: table;margin-left: 1px;}
+.table_cell{display: table-cell;vertical-align: middle;text-align: center;}
+/**********************************************************************************************
+
+
+
+
+/*分页*/
+.page1{width: 870px;}
+.page{width: 870px;height: 36px;margin: 15px auto;}
+.page .first,
+.page .last,
+.page .page_prev,
+.page .page_next,
+.page .count
+{width: 100px;height: 100%;border: 1px solid #C0C0C0;text-align: center;line-height: 36px;margin: 0 5px;cursor: pointer;}
+.page ul li{width: 36px;height: 36px;border: 1px solid #C0C0C0;float: left;margin-left: 10px;text-align: center;line-height: 36px;cursor: pointer;}
+.page ul li.active{border: 1px solid #fa7800;color: #fa7800;}
+.page ul li:hover{background: #fa7800;color: #fff;}
+/*分页end*/
+
+
+

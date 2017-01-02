@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <title>粉丝基本信息管理</title>
+</head>
+<body>
+
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'west',border:false,split:true" title="公众号"
+         style="width:200px;overflow: hidden;overflow-y:auto; ">
+        <ul id="appsTree" style="width:180px;margin: 10px 10px 10px 10px">
+            <li data-options="field:'name',sortable:true,width:80"></li>
+        </ul>
+    </div>
+
+    <div data-options="region:'center',border:false">
+        <table id="dataGrid"></table>
+    </div>
+</div>
+<!--<div id="tb" style="padding:3px">
+    <span>昵称:</span>
+    <input id="form_name" class="easyui-textbox" style="border:1px solid #ccc;width:150px;height:28px">
+    <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_search',plain:true"
+       onclick="doSearch();">查询</a>&nbsp;
+    <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_cancel',plain:true"
+       onclick="clearSearch();">清空</a>
+</div>-->
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    var appid = "";
+    var sexObj = [{"code": "1", "id": "95", "name": "男"}, {"code": "2", "id": "96", "name": "女"}];
+    var tfObj = [{"code": "0", "id": "17", "name": "否"}, {"code": "1", "id": "18", "name": "是"}];
+    var groupObj = [{"code": "", "id": "", "name": ""}, {"code": "", "id": "", "name": ""}, {
+        "code": "",
+        "id": "",
+        "name": ""
+    }, {"code": "", "id": "", "name": ""}, {"code": "", "id": "", "name": ""}, {"code": "", "id": "", "name": ""},
+        {"code": "", "id": "", "name": ""}, {"code": "", "id": "", "name": ""}, {"code": "", "id": "", "name": ""}];
+
+    loader.load('common', function () {
+        $(function () {
+            $.ajax({
+                type: "get",
+                url: "selectList",
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    $.each(result.rows, function (index, obj) {
+                        /*  console.log(index);
+                         console.log(obj);*/
+                        groupObj[index].code = obj.groupid;
+                        groupObj[index].id = obj.groupid;
+                        groupObj[index].name = obj.name;
+
+                    });
+
+                }
+            });
+            $.ajax({
+                type: "get",
+                url: store.get("context") + "/wx/app/dataApps",
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    var tree = new Array();
+                    result.rows.forEach(function (it) {
+                        var treeNode = new Object();
+                        treeNode.id = it.appid;
+                        treeNode.text = it.appName;
+                        tree.push(treeNode);
+                    });
+                    $('#appsTree').tree({
+                        data: tree,
+                        onClick: function (node) {
+                            result.rows.forEach(function (it) {
+                                appid = node.id;
+                                $('#dataGrid').datagrid({
+                                    fit: true,
+                                    border: false,
+                                    pagination: true,
+                                    idField: 'mid',
+                                    url: "dataGrid?appid=" + node.id,
+                                   /* queryParams: {
+                                        nickName: $('#form_name').val()
+                                    },*/
+                                    onBeforeLoad: function (param) {
+                                    },
+                                    remoteSort: true,
+                                    sortName: "mid",
+                                    sortOrder: "asc",
+                                    rownumbers: true,
+                                    pagePosition: 'bottom',
+                                    pageNumber: 1,
+                                    pageSize: 50,
+                                    pageList: [5, 10, 30, 50, 100],
+                                    singleSelect: true,
+                                    toolbar: [
+                                      /*  {text: '添加', iconCls: 'icon-add', handler: append},
+                                        {text: '删除', iconCls: 'icon-remove', handler: removeit},*/
+
+                                        {text: '保存到微信', iconCls: 'icon-save', handler: accept},
+                                        {text: '取消', iconCls: 'icon-redo', handler: reject},
+
+                                        {text: '从微信上同步', iconCls: 'icon-reload', handler: sync},
+                                    ],
+                                    columns: [[
+                                        {
+                                            field: 'mid',
+                                            title: 'mid',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'left',
+                                            checkbox: true
+                                        },
+                                        {
+                                            field: 'headimgurl', title: '用户头像', width: 60, align: 'center',
+                                            formatter: function (value, row, index) {
+                                                return '<img src=' + value + ' style="width:50px;height:50px;align:center"/>';
+                                            }
+                                        },
+                                        {
+                                            field: 'appid',
+                                            title: '公众号',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'center',
+                                            hidden: true
+                                        },
+                                        {
+                                            field: 'openid',
+                                            title: '唯一ID',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'left',
+                                            hidden: true,
+                                            editor: {
+                                                type: 'validatebox',
+                                                options: {required: true, validType: 'length[1,32]'}
+                                            }
+                                        },
+                                        {field: 'nickname', title: '昵称', sortable: true, width: 100, align: 'center'},
+                                        {
+                                            field: 'sex', title: '性别', sortable: true, width: 100, align: 'center',
+                                            formatter: function (value, row, index) {
+                                                if (value == "1") {
+                                                    return "男";
+                                                } else if (value == "2") {
+                                                    return "女";
+                                                }
+                                                return "";
+                                            }
+                                        },
+                                        {
+                                            field: 'language',
+                                            title: '用户语言',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'center',
+                                            hidden: true
+                                        },
+                                        {field: 'city', title: '所在城市', sortable: true, width: 100, align: 'center'},
+                                        {field: 'province', title: '所在省份', sortable: true, width: 100, align: 'center'},
+                                        {field: 'country', title: '所在国家', sortable: true, width: 100, align: 'center'},
+                                        {
+                                            field: 'subscribe',
+                                            title: '是否关注',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'center',
+                                            formatter: function (value, row, index) {
+                                                if (value == "1") {
+                                                    return "是";
+                                                }
+                                            },
+                                        },
+                                        {
+                                            field: 'subscribeTime', title: '关注时间', width: 150, align: 'center',
+                                            formatter: function (value, row, index) {
+                                                return new Date(parseInt(value) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                                            }
+                                        },
+                                        {
+                                            field: 'unionid',
+                                            title: 'unionid',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'left',
+                                            hidden: true
+                                        },
+                                        {
+                                            field: 'remark', title: '粉丝备注', sortable: true, width: 100, align: 'center',
+                                            editor: {
+                                                type: 'validatebox',
+                                                options: {required: true, validType: 'length[1,32]'}
+                                            }
+                                        },
+                                        {
+                                            field: 'groupid', title: '所在的分组', sortable: true, width: 100, align: 'center',
+                                            formatter: function (value, row, index) {
+                                                var name = "";
+                                                $.each(groupObj, function (index, obj) {
+                                                    if (value == "0" && "0" == groupObj[index].id) {
+                                                        name = groupObj[index].name;
+                                                    } else if (value == groupObj[index].id && value != "0") {
+                                                        name = groupObj[index].name;
+                                                    }
+                                                });
+                                                return name;
+                                            },
+                                            editor: {
+                                                type: 'combobox',
+                                                options: {
+                                                    valueField: 'code',
+                                                    textField: 'name',
+                                                    data: groupObj,
+                                                    required: true,
+                                                    editable: false
+                                                }
+                                            }
+                                        },
+                                    ]],
+                                    onDblClickRow: function (index, rowdata) {
+
+                                        if (editIndex != index) {
+                                            if (endEditing()) {
+                                                $('#dataGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                                                editIndex = index;
+                                            } else {
+                                                $('#dataGrid').datagrid('selectRow', editIndex);
+                                            }
+                                        }
+
+                                    }
+                                });
+                                $('#tb').appendTo('.datagrid-toolbar');
+                            });
+
+                        }
+                    });
+                }
+            });
+            $('#dataGrid').datagrid({
+                fit: true,
+                border: false,
+                pagination: true,
+                idField: 'mid',
+                url: "dataGrid",
+               /* queryParams: {
+                    nickname: $('#form_name').val()
+                },*/
+                onBeforeLoad: function (param) {
+                },
+                remoteSort: true,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagePosition: 'bottom',
+                pageNumber: 1,
+                pageSize: 50,
+                pageList: [5, 10, 30, 50, 100],
+                singleSelect: true,
+
+                toolbar: [
+                  /*  {text: '添加', iconCls: 'icon-add', handler: append},
+                    {text: '删除', iconCls: 'icon-remove', handler: removeit},*/
+                    {text: '保存到微信', iconCls: 'icon-save', handler: accept},
+                    {text: '取消', iconCls: 'icon-redo', handler: reject},
+
+                    {text: '从微信上同步', iconCls: 'icon-reload', handler: sync},
+                ],
+                columns: [[
+                    {field: 'mid', title: 'mid', sortable: true, width: 100, align: 'center', checkbox: true},
+                    {
+                        field: 'headimgurl', title: '用户头像', width: 60, align: 'center',
+                        formatter: function (value, row, index) {
+                            return '<img src=' + value + ' style="width:50px;height:50px;align:center"/>';
+                        }
+                    },
+                    {field: 'appid', title: '公众号', sortable: true, width: 100, align: 'left', hidden: true},
+                    {
+                        field: 'openid', title: '唯一ID', sortable: true, width: 100, align: 'left', hidden: true,
+                        editor: {type: 'validatebox', options: {required: true, validType: 'length[1,32]'}}
+                    },
+                    {field: 'nickname', title: '昵称', sortable: true, width: 100, align: 'center'},
+                    {
+                        field: 'sex', title: '性别', sortable: true, width: 100, align: 'center',
+                        formatter: function (value, row, index) {
+                            if (value == "1") {
+                                return "男";
+                            } else if (value == "2") {
+                                return "女";
+                            }
+                            return "";
+                        }
+                    },
+                    {field: 'language', title: '用户语言', sortable: true, width: 100, align: 'left', hidden: true},
+                    {field: 'city', title: '所在城市', sortable: true, width: 100, align: 'center'},
+                    {field: 'province', title: '所在省份', sortable: true, width: 100, align: 'center'},
+                    {field: 'country', title: '所在国家', sortable: true, width: 100, align: 'center'},
+                    {
+                        field: 'subscribe', title: '是否关注', sortable: true, width: 100, align: 'center',
+                        formatter: function (value, row, index) {
+                            if (value == "1") {
+                                return "是";
+                            }
+                        },
+                    },
+                    {
+                        field: 'subscribeTime', title: '关注时间', width: 150, align: 'center',
+                        formatter: function (value, row, index) {
+                            return new Date(parseInt(value) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+                        }
+                    },
+                    {field: 'unionid', title: 'unionid', sortable: true, width: 100, align: 'left', hidden: true},
+                    {
+                        field: 'remark', title: '粉丝备注', sortable: true, width: 100, align: 'center',
+                        editor: {type: 'validatebox', options: {required: true, validType: 'length[1,32]'}}
+                    },
+                    {
+                        field: 'groupid', title: '所在的分组', sortable: true, width: 100, align: 'center',
+                        formatter: function (value, row, index) {
+                            var name = "";
+                            $.each(groupObj, function (index, obj) {
+                                if (value == "0" && "0" == groupObj[index].id) {
+                                    name = groupObj[index].name;
+                                } else if (value == groupObj[index].id && value != "0") {
+                                    name = groupObj[index].name;
+                                }
+                            });
+                            return name;
+                        },
+                        editor: {
+                            type: 'combobox',
+                            options: {
+                                valueField: 'code',
+                                textField: 'name',
+                                data: groupObj,
+                                required: true,
+                                editable: false
+                            }
+                        }
+                    },
+                ]],
+                onDblClickRow: function (index, rowdata) {
+
+                    if (editIndex != index) {
+                        if (endEditing()) {
+                            $('#dataGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                            editIndex = index;
+                        } else {
+                            $('#dataGrid').datagrid('selectRow', editIndex);
+                        }
+                    }
+
+                }
+            });
+            $('#tb').appendTo('.datagrid-toolbar');
+        });
+    });
+    var editIndex = undefined;
+    function endEditing() {
+        if (editIndex == undefined) {
+            return true
+        }
+        if ($('#dataGrid').datagrid('validateRow', editIndex)) {
+            $('#dataGrid').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            parent.showToast('error', "您有信息未填写完善");
+            return false;
+        }
+    }
+   /* function doSearch() {
+        var form_id = $('#form_name').val();
+        $('#dataGrid').datagrid('load', {
+            nickname: form_id
+        });
+    }*/
+    function clearSearch() {
+       /* $('#form_name').textbox('setValue', '');*/
+        $('#dataGrid').datagrid('load', {});
+    }
+
+    function append() {
+        if (endEditing()) {
+            $('#dataGrid').datagrid('appendRow', {});
+            editIndex = $('#dataGrid').datagrid('getRows').length - 1;
+            $('#dataGrid').datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+        }
+    }
+
+
+    function accept() {
+        if (endEditing()) {
+            var rows = $('#dataGrid').datagrid('getChanges');
+
+            if (rows.length <= 0) {
+                parent.$.messager.alert('提示', "数据未发生变化", 'info');
+                return;
+            }
+            parent.$.messager.confirm('保存确认', '您是否要同步数据到服务器', function (b) {
+                if (b) {
+                    //  add busi code here
+                    for (var i = 0; i < rows.length; i++) {
+                        progressLoad("正在保存第" + (i + 1) + "项");
+                        doSave(rows[i]);
+
+                    }
+                    progressClose();
+                    $('#dataGrid').datagrid('reload');
+                    $('#dataGrid').datagrid('unselectAll');
+                    editIndex = undefined;
+                }
+            });
+        }
+    }
+    function doSave(obj) {
+        if (!appid) {
+            parent.$.messager.alert('提示', "没有选取公众号,不能操作！", 'info');
+            return;
+        }
+        var url = "edit";
+        /* if(!obj["id"] || obj["id"].length==0) {
+         url = "/ctl/vsmsWxFans/add" ;
+         }*/
+        $.ajax({
+            url: url,
+            dataType: "json",
+            data: obj,
+            async: false,
+            type: "POST",
+            success: function () {
+                return true;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.readyState);
+                $('#dataGrid').datagrid('selectRow', editIndex);
+                return false;
+            }
+        });
+    }
+    function reject() {
+        $('#dataGrid').datagrid('rejectChanges');
+        $('#dataGrid').datagrid('unselectAll');
+        editIndex = undefined;
+    }
+
+
+    function removeit() {
+        if (endEditing()) {
+            parent.$.messager.confirm('删除确认', '您是否要删除当前记录', function (b) {
+                if (b) {
+                    var obj = $('#dataGrid').datagrid('getSelected');
+                    var _json = $.param({"id": obj["id"]});
+                    $.ajax({
+                        url: "delete",
+                        dataType: "json",
+                        data: _json,
+                        type: "POST",
+                        success: function () {
+                            $('#dataGrid').datagrid('reload');
+                            editIndex = undefined;
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert(XMLHttpRequest.readyState);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+
+    function sync() {
+        if (!appid) {
+            parent.$.messager.alert('提示', "没有选取公众号", 'info');
+            return;
+        }
+        progressLoad("正在同步...");
+        $.ajax({
+            url: "sync?appid=" + appid,
+            type: "get",
+            dataType: "json",
+            success: function () {
+                parent.$.messager.alert('提示', "同步完成", 'info');
+                $('#dataGrid').datagrid('reload');
+                progressClose();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                progressClose();
+                alert(XMLHttpRequest.readyState);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

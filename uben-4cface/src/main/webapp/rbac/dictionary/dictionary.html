@@ -1,0 +1,82 @@
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input name="mid" id="mid" type="hidden"/>
+            <table class="grid">
+                <tr style="height:40px">
+                    <td>自编码</td>
+                    <td><input name="code" id="code" class="easyui-textbox"
+                               data-options="required:true,prompt:'请输入自编码'" style="height:28px">
+                    </td>
+                    <td>名称</td>
+                    <td><input name="name" id="name" class="easyui-textbox" data-options="required:true,prompt:'请输入名称'" style="height:28px">
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>所属类别</td>
+                    <td colspan="3">
+                        <input id="typeName" name="typeName" type="hidden" style="height:28px"/>
+                        <input id="typeId" name="typeId" data-options="required:true" style="height:28px"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;"
+                           onclick="$('#typeId').combobox('clear');">
+                            清空
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    render(function (data, method) {
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            $("#typeId").val(data.typeId);
+        } else {
+            $("#mid").attr("disabled", "disabled");
+        }
+        $.ajax({
+            type: "get",
+            url: parent.$.modalDialog.path + "Category",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                $("#typeId").combobox({
+                    data: result.rows,
+                    valueField: 'mid',
+                    textField: 'name',
+                    onChange: function (newValue) {
+                    }
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var tmp = $("#typeId").combobox("getText");
+                    console.log(tmp);
+                    $("#typeName").val(tmp);
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.refresh();
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+
+</script>

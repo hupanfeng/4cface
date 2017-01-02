@@ -1,0 +1,277 @@
+<body>
+
+
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" style="overflow: hidden;">
+        <form id="form" method="post">
+            <input id="mid" name="mid" type="hidden"/>
+            <table class="grid">
+                <tr style="height:40px">
+                    <td>菜单名称</td>
+                    <td>
+                        <input name="name" id="name" class="easyui-textbox"
+                               data-options="width:230,required:true,prompt:'请输入菜单名'" style="height:28px">
+                    </td>
+                    <td>菜单响应类型</td>
+                    <td>
+                        <select name="responseType" id="responseType" class="easyui-combobox"
+                                data-options="width:230,editable: false" style="height:28px">
+                            <option value="click">点击事件</option>
+                            <option value="view">跳转URL</option>
+                            <option value="scancode_push">扫码事件</option>
+                            <option value="scancode_waitmsg">扫码事件且弹出“消息接收中”提示框</option>
+                            <option value="pic_sysphoto">弹出系统拍照发图</option>
+                            <option value="pic_photo_or_album">弹出拍照或者相册发图</option>
+                            <option value="pic_weixin">弹出微信相册发图器</option>
+                            <option value="location_select">弹出地理位置选择器</option>
+                            <option value="media_id">下发消息</option>
+                            <option value="view_limited">跳转图文消息URL</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>菜单类型</td>
+                    <td>
+                        <select name="menuType" id="menuType" class="easyui-combobox"
+                                data-options="width:230,editable:false" style="height:28px">
+                            <option value="1">普通菜单</option>
+                            <option value="2">个性化菜单</option>
+                        </select>
+                    </td>
+                    <td>序&nbsp;&nbsp;号</td>
+                    <td>
+                        <input name="orderNum" id="orderNum" class="easyui-textbox" data-options="width:230"
+                               style="height:28px"/>
+                    </td>
+                </tr>
+                <tr id="menutr" style="height:40px">
+                    <td>公众号</td>
+                    <td>
+                        <input id="appid" name="appid" style="width: 190px;height:28px" data-options="required:true"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px;height:28px"
+                           onclick="$('#appid').combobox('clear');">
+                            清空
+                        </a>
+                    </td>
+                </tr>
+                <tr id="keyandurltr" style="height:40px">
+                    <td group='group'>key</td>
+                    <td group='group'>
+                        <input name="menukey" id="menukey" class="easyui-textbox"
+                               data-options="width:230,required: true, prompt: '请输入key'" style="height:28px"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    render(function (data, method) {
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            if (data.menuType == "1") {
+                $("[group='matchrule']").remove();
+            } else {
+                getMatchrule(data);
+            }
+            $("[group='group']").remove();
+            typeIf(data.responseType, data);
+            getMenu(data.appid, data);
+        } else {
+            $("#mid").attr("disabled", "disabled");
+            $("[group='matchrule']").hide();
+        }
+        $("#menuType").combobox({
+            onSelect: function (r) {
+                if (r.value == 2) {
+                    getMatchrule(null);
+                } else {
+                    $("[group='matchrule']").remove();
+                }
+            }
+        });
+        $("#responseType").combobox({
+            onSelect: function (r) {
+                $("[group='group']").remove();
+                typeIf(r.value, null);
+            }
+        });
+        $.ajax({
+            type: "get",
+            url: store.get("context") + "/wx/app/dataApps",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.appName;
+                    treeNode.value = it.appid;
+                    tree.push(treeNode);
+                });
+                $("#appid").combobox({
+                    data: tree,
+                    editable: false,
+                    onSelect: function (r) {
+                        $("[group='menu']").remove();
+                        getMenu(r.value, null);
+                    }
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.refresh();
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+    function getMatchrule(data) {
+        $("#keyandurltr").append("<td group='matchrule'>匹配规则</td>" +
+                "<td group='matchrule'>" +
+                "<input name='matchruleId' id='matchruleId' data-options='width:190'/>" +
+                "<a class='easyui-linkbutton fr' href='javascript:void(0)' style='margin-left: 3px;'  onclick='$(\"#matchruleId\").combobox(\"clear\");'>清空</a>" +
+                "</td>");
+        $("[class='easyui-linkbutton fr']").linkbutton({});
+        $.ajax({
+            type: "get",
+            url: store.get("context") + "/wx/matchrules/dataGridAll",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.name;
+                    treeNode.value = it.mid;
+                    tree.push(treeNode);
+                });
+                if (data) {
+                    $("#matchruleId").combobox({
+                        data: tree,
+                        editable: false,
+                        value: data.ruleIds,
+                        multiple: true,
+                        cascadeCheck: false
+                    });
+                } else {
+                    $("#matchruleId").combobox({
+                        data: tree,
+                        editable: false,
+                        multiple: true,
+                        cascadeCheck: false
+                    });
+                }
+
+            }
+        });
+    }
+    function getMenu(appid, data) {
+        $("#menutr").append("<td group='menu'>上级菜单</td>" +
+                "<td group='menu'>" +
+                "<input id=\"pid\" name=\"pid\" style=\"width: 190px;height:28px\"/>" +
+                "<a class=\"easyui-linkbutton fr\" href=\"javascript:void(0)\" style=\"margin-left:3px;\"" +
+                "onclick=\"$('#pid').combotree('clear');\">" +
+                "清空</a>" +
+                "</td>");
+        $("[class = 'easyui-linkbutton fr']").linkbutton({});
+        $.ajax({
+            type: "get",
+            url: parent.$.modalDialog.path + "dataByApp?appid=" + appid,
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                if (result.rows) {
+                    result.rows.forEach(function (it) {
+                        var treeNode = new Object();
+                        treeNode.id = it.mid;
+                        treeNode.text = it.name;
+                        treeNode.state = "open";
+                        treeNode.pid = it.pid;
+                        tree.push(treeNode);
+                    });
+                }
+                var menu = "";
+                if (data) {
+                    menu = data.pid;
+                }
+                $("#pid").combotree({
+                    parentField: "pid",
+                    data: tree,
+                    value: menu
+                });
+            }
+        });
+    }
+    function typeIf(value, data) {
+        if (!value) {
+            $("#keyandurltr").prepend("<td group='group'>key</td>" +
+                    "<td group='group'>" +
+                    "<input name='menukey' id='menukey' class='easyui-textbox' data-options='width:230,height:28'/>" +
+                    "</td>");
+            $("#menukey").textbox({required: true, prompt: "请输入key", value: "null"});
+        } else if (value == "click") {
+            $("#keyandurltr").prepend("<td group='group'>key</td>" +
+                    "<td group='group'>" +
+                    "<input name='menukey' id='menukey' class='easyui-textbox' data-options='width:230'/>" +
+                    "</td>");
+            if (data) {
+                $("#menukey").textbox({required: true, prompt: "请输入key", value: data.menukey});
+            } else {
+                $("#menukey").textbox({required: true, prompt: "请输入key"});
+            }
+        } else if (value == "view") {
+            $("#keyandurltr").prepend("<td group='group'>跳转地址</td>" +
+                    "<td group='group'>" +
+                    "<input name='url' id='url' class='easyui-textbox' data-options='width:230'/>" +
+                    "</td>");
+            if (data) {
+                $("#url").textbox({required: true, prompt: "请输入url", value: data.url});
+            } else {
+                $("#url").textbox({required: true, prompt: "请输入url"});
+            }
+        } else if (value == "media_id" || value == "view_limited") {
+            $("#keyandurltr").prepend("<td group='group'>media_id</td>" +
+                    "<td group='group'>" +
+                    "<input name='mediaId' id='mediaId' class='easyui-textbox' data-options='width:230'/>" +
+                    "</td>");
+            if (data) {
+                $("#mediaId").textbox({required: true, prompt: "请输入media_id", value: data.mediaId});
+            } else {
+                $("#mediaId").textbox({required: true, prompt: "请输入media_id"});
+            }
+        } else {
+            $("#keyandurltr").prepend("<td group='group'>key</td>" +
+                    "<td group='group'>" +
+                    "<input name='menukey' id='menukey' class='easyui-textbox' data-options='width:230'/>" +
+                    "</td>");
+            if (data) {
+                $("#menukey").textbox({required: true, prompt: "请输入key", value: data.menukey});
+            } else {
+                $("#menukey").textbox({required: true, prompt: "请输入key"});
+            }
+        }
+    }
+</script>
+</body>

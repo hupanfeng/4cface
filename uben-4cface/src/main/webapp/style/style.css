@@ -1,0 +1,166 @@
+*{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-decoration: none;
+	font-family:  "Helvetica Neue",Helvetica,"Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+	font-size:16px;
+	color:#3e3e3e;
+}
+img{
+	vertical-align: middle;
+}
+.fl{
+	float: left;
+}
+.fr{
+	float: right;
+}
+.header{
+	width: 100%;
+	overflow: hidden;
+	background: #fff;
+}
+.head_form{
+	width: 75%;
+	height: 2em;
+	background: #eee;
+	overflow: hidden;
+	margin: 0 auto;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	padding: 0 8px;
+}
+
+
+.search_text input{
+	width:80%;
+	height: 100%;
+	background: #eee;
+	border:none;
+	padding-left: 10px;
+}
+
+
+/***/
+.container{
+	width: 100%;
+	overflow: hidden;
+	background: #fff;
+	margin: 3% 0;
+}
+.con_main{
+	width: 94%;
+	overflow: hidden;
+	margin: 0 auto;
+}
+.menu_list{
+	width: 100%;
+	overflow: hidden;
+}
+.menu_list>li{
+	width: 100%;
+	line-height: 2.7em;
+	border-bottom:1px solid #eee;
+	cursor: pointer;
+}
+.menu_list li>i{
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border:5px solid #666;
+	border-top:5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-right:5px solid transparent;
+	margin-right: 10px;
+}
+.child_menu{
+	width: 100%;
+	overflow: hidden;
+	display: none;
+}
+.child_menu>p{
+	width: 100%;
+	line-height: 2.7em;
+	border-top:1px solid #eee;
+	float: left;
+}
+.child_menu>p font{
+	float: left;
+	width: 95%;
+}
+.child_menu>p img{
+	width:8px;
+	float: left;
+	margin-top:12px;
+}
+
+
+
+/******/
+.Details_text{
+	width: 100%;
+	overflow: hidden;
+}
+.Details_text li{
+	width: 100%;
+	overflow: hidden;
+	border-bottom:1px solid #eee;
+	display: table;
+	padding: 2% 0 1%;
+	
+}
+.Details_text li a{
+	display:table;
+}
+.Details_img{
+	overflow: hidden;
+	display:table-cell;
+	vertical-align: middle;
+}
+.Details_info font{
+	display:table-cell;
+	vertical-align: middle;
+}
+.Details_info{
+	width: 96%;
+	display:table-cell;
+	padding-left: 10px;
+	vertical-align: middle;
+}
+
+
+/****/
+.text_tit{
+	font-size:25px;
+	color:#333;
+	line-height: 1.4;
+}
+.text_info{
+	width: 100%;
+}
+.text_info font{
+	margin-right: 7px;
+}
+.text_info font,.text_info a{
+	color:#8c8c8c;
+}
+.text_main{
+	text-indent: 2em;
+	margin-top: 15px;
+	line-height: 1.7;
+}
+.link_info{
+	width: 100%;
+	margin-top: 20px;
+}
+.link_info h2{
+	line-height: 1.5;
+}
+.link_info p>a{
+	display: inline-block;
+	line-height: 1.5;
+	text-decoration:underline;
+	color:#607fa6;
+}

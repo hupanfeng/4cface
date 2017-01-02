@@ -1,0 +1,199 @@
+<style>
+    table td input {
+        width: 200px;
+    }
+</style>
+<script type="text/javascript">
+    render(function (data, method) {
+        var roles = "";
+        var orgs = "";
+        if (data) {
+            $("#mid").removeAttr("disabled");
+            $("#mid").val(data.mid);
+            roles = data.roles;
+            orgs = data.orgs;
+        } else {
+            $("#mid").attr("disabled", "disabled");
+            $("#password").attr("data-options", "required:true,validType:'length[6,16]'");
+            $("#message").hide();
+        }
+        $.ajax({
+            type: "get",
+            url: store.get("context") + "/rbac/role/dataGrid",
+            dataType: "json",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.name;
+                    treeNode.state = "open";
+                    treeNode.pid = it.pid;
+                    treeNode.levelCode = it.levelCode;
+                    tree.push(treeNode);
+                });
+                $("#roles").combotree({
+                    parentField: "pid",
+                    data: tree,
+                    value: roles,
+                    multiple: true,
+                    cascadeCheck: false,
+                    onSelect: function (newValue) {
+                        $("#rolepLevelCode").val(newValue.levelCode);
+                    }
+                });
+            }
+        });
+        $.ajax({
+            type: "get",
+            url: store.get("context") + "/rbac/org/dataGrid",
+            dataType: "json",
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                var tree = new Array();
+                result.rows.forEach(function (it) {
+                    var treeNode = new Object();
+                    treeNode.id = it.mid;
+                    treeNode.text = it.orgName;
+                    treeNode.state = "open";
+                    treeNode.pid = it.orgPid;
+                    treeNode.levelCode = it.levelCode;
+                    tree.push(treeNode);
+                });
+                $("#orgIds").combotree({
+                    parentField: "pid",
+                    data: tree,
+                    value: orgs,
+                    multiple: true,
+                    cascadeCheck: false,
+                   onSelect: function (newValue) {
+                        $("#orgpLevelCode").val(newValue.levelCode);
+                    }
+
+                /*    onLoadSuccess: function () {$('#orgIds').combotree("tree").tree('collapseAll')},
+                        把combotree下拉收起来
+                    onCheck : function(node,checked){
+                        var tr =  $("#orgIds").combotree("tree");
+                        if(checked){
+                            var childNode;
+                            childNode = tr.tree("getChildren",node.target);
+                            for(var i= 0;i<childNode.length;i++){
+                                tr.tree("check", childNode[i].target);
+                            }
+                        }else {
+                            var childNode = tr.tree("getChildren",node.target);
+                            for(var i= 0;i<childNode.length;i++)
+                            {
+                                tr.tree("uncheck", childNode[i].target);
+                            }
+                        }
+                        勾中父类全部选中子类
+                    }*/
+                });
+            }
+        });
+        $(function () {
+            $('#form').form({
+                url: parent.$.modalDialog.path + method,
+                onSubmit: function () {
+                    progressLoad();
+                    var isValid = $(this).form('validate');
+                    if (!isValid) {
+                        progressClose();
+                    }
+                    return isValid;
+                },
+                success: function (result) {
+                    progressClose();
+                    result = $.parseJSON(result);
+                    if (result.success) {
+                        parent.$.modalDialog.openner_dataGrid.datagrid('reload');//之所以能在这里调用到parent.$.modalDialog.openner_dataGrid这个对象，是因为user.jsp页面预定义好了
+                        parent.$.modalDialog.handler.dialog('close');
+                    } else {
+                        parent.$.messager.alert('错误', result.msg, 'error');
+                    }
+                }
+            });
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" class="editBox" title="" stygle="overflow: hidden;">
+        <form id="form" method="post">
+            <input name="mid" id="mid" type="hidden"/>
+            <div class="wb-info" style="overflow: hidden;padding: 3px;" id="message">
+                <div>密码不修改请留空</div>
+            </div>
+            <table class="grid">
+                <tr style="height:40px">
+                    <td>登录名</td>
+                    <td>
+                        <input name="loginname" placeholder="请输入登录名称" class="easyui-textbox"
+                               data-options="required:true,validType:'length[2,16]'" value="" style="height:28px">
+                    </td>
+                    <td>密码</td>
+                    <td>
+                        <input name="password" id="password" type="password" class="easyui-textbox" style="height:28px">
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>姓名</td>
+                    <td>
+                        <input name="name" type="text" placeholder="请输入姓名" class="easyui-textbox"
+                               data-options="required:true,validType:'length[2,16]'" value="" style="height:28px">
+                    </td>
+                    <td>员工号</td>
+                    <td>
+                        <input id="userNo" placeholder="请输入员工号" name="userNo" class="easyui-textbox"/ style="height:28px">
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>手机</td>
+                    <td>
+                        <input id="mobile" class="easyui-textbox" name="mobile"
+                               data-options="validType:'length[11,11]',required:true" style="height:28px"/>
+                    </td>
+                    <td>邮箱</td>
+                    <td>
+                        <input class="easyui-textbox" id="email" type="text" name="email"
+                               data-options="validType:'email'" style="height:28px"/>
+                    </td>
+
+                </tr>
+                <tr style="height:40px">
+                    <td>所在组织</td>
+                    <td colspan="3">
+                        <input id="orgpLevelCode" name="orgpLevelCode" type="hidden" style="height:28px"/>
+                        <input id="orgIds" name="orgIds" data-options="required:true" style="width: 492px; height:28px"/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px; width:70px;"
+                           onclick="$('#orgIds').combotree('clear');">清空 </a>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>角色</td>
+                    <td colspan="3">
+                        <input id="rolepLevelCode" name="pLevelCode" type="hidden" style="height:28px"/>
+                        <input id="roles" name="roles" data-options="required:true" style="width: 492px;height:28px "/>
+                        <a class="easyui-linkbutton fr" href="javascript:void(0)" style="margin-right:6px; width:70px;line-height:28px"
+                           onclick="$('#roles').combotree('clear');">
+                            清空
+                        </a>
+                    </td>
+                </tr>
+                <tr style="height:40px">
+                    <td>状态</td>
+                    <td>
+                        <select name="stateid" class="easyui-combobox"
+                                data-options="width:200,editable:false,panelHeight:'auto'" style="height:28px">
+                            <option value="0">停用</option>
+                            <option value="1" selected="selected">正常</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

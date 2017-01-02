@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="./style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="./js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="./js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="./style/wb.css">
+    <link rel="stylesheet" type="text/css" href="./style/main.css"/>
+    <title></title>
+</head>
+<body>
+<div id="loading"
+     style="position: fixed;top: -50%;left: -50%;width: 200%;height:200%;background: #fff;z-index: 100;overflow: hidden;">
+    <img src="./style/images/index/ajax-loader.gif"
+         style="position: absolute;top: 0;left: 0;right: 0;bottom: 0;margin: auto;"/>
+</div>
+<div id="index_layout">
+    <div class="region-north" data-options="region:'north'" style=" overflow: hidden;" id="header">
+        <span class="headRt"></span>
+        <span class="header">
+            <img style="position: absolute; left:20px;top:50%; margin-top:-25px; width: 45px; display: inline-block;"
+                 src="./style/images/index/logo.png" alt=""><h1>欢迎使用4C菲斯会员管理系统</h1></span>
+        <span style="float: right; padding-right: 10px" class="top_info">欢迎 <b id="username"></b>
+				<a href="javascript:void(0)" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon_user'"/>个人中心</a>
+            <!-- <a href="javascript:void(0)" class="easyui-menubutton" data-options="menu:'#mm2'">系统皮肤</a>-->
+				<a href="javascript:void(0)" class="easyui-menubutton" data-options="menu:'#mm3'">界面字体</a>
+        </span>
+        <div id="mm1" style="width:100px;" data-options="onClick:selfHandler">
+            <div data-options="name:'editUserPwd',iconCls:'icon-edit'">修改密码</div>
+            <!-- <div data-options="name:'editSign',iconCls:'icon2_sign'">修改签名</div>-->
+            <!--<div data-options="name:'grantUser',iconCls:'icon2_wfrole'">审批授权</div>-->
+            <div data-options="name:'logout',iconCls:'icon-lock'">安全退出</div>
+        </div>
+        <!--<div id="mm2" style="width:100px;" data-options="onClick:menuHandler">-->
+        <!--<div data-options="name:'default'">默认</div>-->
+        <!--<div data-options="name:'black'">黑色</div>-->
+        <!--<div data-options="name:'gray'">灰色</div>-->
+        <!--<div data-options="name:'bootstrap'">淡雅</div>-->
+        <!--<div data-options="name:'metro'">美俏</div>-->
+        <!--<div data-options="name:'ui-sunny'">阳光</div>-->
+        <!--<div data-options="name:'metro-blue'">美俏蓝</div>-->
+        <!--<div data-options="name:'metro-gray'">美俏灰</div>-->
+        <!--<div data-options="name:'metro-green'">美俏绿</div>-->
+        <!--<div data-options="name:'metro-orange'">美俏橙</div>-->
+        <!--<div data-options="name:'metro-red'">美俏红</div>-->
+        <!--<div data-options="name:'ui-cupertino'">天蓝色</div>-->
+        <!--<div data-options="name:'ui-dark-hive'">纯黑</div>-->
+        <!--<div data-options="name:'ui-pepper-grinder'">胡椒灰</div>-->
+        <!--</div>-->
+        <div id="mm3" style="width:100px;"  data-options="onClick:fontSizeHandler">
+            <div data-options="name:''">默认</div>
+            <div data-options="name:'font13'">13</div>
+            <div data-options="name:'font14'">14</div>
+            <div data-options="name:'font15'">15</div>
+            <div data-options="name:'font16'">16</div>
+            <div data-options="name:'font17'">17</div>
+            <div data-options="name:'font18'">18</div>
+            <div data-options="name:'font19'">19</div>
+            <div data-options="name:'font20'">20</div>
+        </div>
+        <div class="fontSizeChange" style="display: none;">
+            <select name="" id="fontSizeChange">
+                <option value="font12">字体</option>
+                <option value="font13">字体13</option>
+                <option value="font14">字体14</option>
+                <option value="font15">字体15</option>
+                <option value="font16">字体16</option>
+                <option value="font17">字体17</option>
+                <option value="font18">字体18</option>
+                <option value="font19">字体19</option>
+                <option value="font20">字体20</option>
+                <option value="font21">字体21</option>
+                <option value="font22">字体22</option>
+            </select>
+        </div>
+    </div>
+    <!-- 左侧内容 -->
+    <div data-options="region:'west',split:true" title="主导航" style="width: 190px; overflow: hidden;overflow-y:auto;">
+        <div class="well well-small">
+            <ul id="layout_west_tree" class="nav_tree">
+
+            </ul>
+        </div>
+    </div>
+
+    <!--  右侧内容 -->
+    <div data-options="region:'center'" style="overflow: hidden;">
+        <div id="index_tabs" style="overflow: hidden;">
+            <div title="首页" data-options="border:false,iconCls:'icon2_home'" style="overflow: hidden;">
+                <div style="padding:0;height:100%;overflow:auto;">
+                    <div region="center" border="false">
+
+                        <div class="main_rt">
+                            <div class="main_rt_tit">
+                                <strong>您好！</strong>
+                                <p>
+                                    欢迎使用4C菲斯会员管理系统，我们旨在搭建一个石油人资源共享、互相交流的平台，为石油人提供井下作业工具相关参数、技术规格、库存情况等信息。是石油井下作业相关人员的最佳选择。
+                                </p>
+                            </div>
+                            <div class="main_rt_test">
+                                <p>下一步，您可能想要创建：</p>
+                                <ul class="test_info_list">
+                                    <li>
+                                        <a href="javascript:void(0);"
+                                           onclick="gotoInfo('知识文档','./doc/docList.html','icon_folder')">
+                                            <strong>知识文档：</strong>
+                                            <span>介绍工具的用途、结构、工作原理、技术规范、操作方法及注意事项</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);"
+                                           onclick="gotoInfo('知识类别','./toolcategory/categoryList.html','icon_folder')">
+                                            <strong>知识类别：</strong>
+                                            <span>知识工具的分类</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" onclick="gotoInfo('知识模板',
+                                        './doctemplate/doctemplateList.html','icon_folder')">
+                                            <strong>知识模板：</strong>
+                                            <span>知识工具的使用模板</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);"
+                                           onclick="gotoInfo('应用案例','./cases/casesList.html','icon_folder')">
+                                            <strong>应用案例：</strong>
+                                            <span>知识工具主要用途及介绍</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);"
+                                           onclick="gotoInfo('工具信息','./toolInformation/toolInformationList.html','icon_folder')">
+                                            <strong>工具信息：</strong>
+                                            <span>知识工具的名称、库存状态、时间、价格及厂家</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);"
+                                           onclick="gotoInfo('仓库管理','./warehouse/warehouseList.html','icon_folder')">
+                                            <strong>仓库管理：</strong>
+                                            <span>知识工具的仓库名称及存放位置</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="region-south" data-options="region:'south',border:false">
+</div>
+<div id="nav_menu" class="easyui-menu" style="width:120px;">
+    <div>关闭当前页</div>
+    <div>关闭其他</div>
+    <div>关闭左侧</div>
+    <div>关闭右侧</div>
+    <div>全部关闭</div>
+</div>
+</div>
+<script type="text/javascript" src="./js/loader.js"></script>
+<script src="js/jquery-1.12.4.js"></script>
+<script type="text/javascript">
+    $('.nav_tree').on('click', 'li', function (e) {
+        e.stopPropagation();
+        $(this).find('ul').toggle();
+    });
+    loader.load('common', function () {
+        $("#username").text(store.get("user").name);
+        var index_layout;
+        var index_tabs;
+        var layout_west_tree;
+        $(function () {
+            index_layout = $('#index_layout').layout({
+                fit: true
+            });
+            index_tabs = $('#index_tabs').tabs({
+                fit: true,
+                border: false,
+                tools: [{
+                    iconCls: 'icon_home',
+                    handler: function () {
+                        index_tabs.tabs('select', 0);
+                    }
+                }, {
+                    iconCls: 'icon_refresh',
+                    handler: function () {
+                        var tab = index_tabs.tabs('getSelected');  // get selected panel
+                        if (tab.panel('options').title == '首页') {
+                            window.location.reload();
+                        }
+                        else {
+                            index_tabs.tabs('update', {
+                                tab: tab,
+                                options: {
+                                    content: addTab(tab.panel('options'))
+                                }
+                            });
+                        }
+                    }
+                }, {
+                    iconCls: 'icon_del',
+                    handler: function () {
+                        var index = index_tabs.tabs('getTabIndex', index_tabs.tabs('getSelected'));
+                        var tab = index_tabs.tabs('getTab', index);
+                        if (tab.panel('options').closable) {
+                            index_tabs.tabs('close', index);
+                        }
+                    }
+                }]
+            });
+
+            $('#index_tabs').tabs({
+                onContextMenu: function (e) {
+                    e.preventDefault();
+                    //e.stopPropagation();
+                    $('#nav_menu').menu('show', {
+                        left: e.pageX,
+                        top: e.pageY
+                    })
+                }
+            });
+            $('#nav_menu').menu({
+                onClick: function (item) {
+                    if (item["text"] == '关闭当前页') {
+                        var index = $('#index_tabs').tabs('getTabIndex', $('#index_tabs').tabs('getSelected'));
+                        if (index > 0) closeTab();
+                    } else if (item["text"] == '全部关闭') {
+                        closeAll();
+                    } else if (item["text"] == '关闭其他') {
+                        closeOther();
+                    } else if (item["text"] == '关闭左侧') {
+                        closeLeft();
+                    } else if (item["text"] == '关闭右侧') {
+                        closeRight();
+                    }
+                }
+            });
+
+            layout_west_tree = $('#layout_west_tree').tree({
+                data: tree(),
+                parentField: 'pid',
+                lines: true,
+                onClick: function (node) {
+                    if (node.attributes && node.attributes.url) {
+                        var url = "." + node.attributes.url;
+                        addTab({
+                            url: url,
+                            title: node.text,
+                            iconCls: node.iconCls
+                        });
+                    }
+                }
+            });
+        });
+
+        window.addT = function (title, url, iconCls) {
+            addTab({title: title, url: url, iconCls: iconCls});
+        }
+
+        window.addTab = function (params) {
+            var iframe = '<iframe src="' + params.url + '" frameborder="0" style="border:0;width:100%;height:99%;"></iframe>';
+            var t = $('#index_tabs');
+            var opts = {
+                title: params.title,
+                closable: true,
+                iconCls: params.iconCls,
+                content: iframe,
+                border: false,
+                fit: true
+            };
+            if (t.tabs('exists', opts.title)) {
+                t.tabs('select', opts.title);
+            } else {
+                t.tabs('add', opts);
+            }
+        }
+
+        window.logout = function logout() {
+            $.messager.confirm('提示', '确定要退出?', function (r) {
+                if (r) {
+                    progressLoad();
+                    $.ajax({
+                        type: "post",
+                        contentType: "application/json; charset=utf-8",
+                        url: "logout",
+                        cache: false,
+                        dataType: "json",
+                        success: function (result) {
+                            if (result.success) {
+                                progressClose();
+                                store.clear();
+                                window.location.href = 'login.html';
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        window.closeTab = function closeTab() {
+            var tab = $('#index_tabs').tabs('getSelected');
+            var home = $('#index_tabs').tabs('getTabIndex', tab);
+            $('#index_tabs').tabs('close', home);
+        }
+
+        window.editUserPwd = function () {
+            var saveButton = {
+                text: '确认',
+                iconCls: 'icon-ok',
+                handler: function () {
+                    var f = parent.$.modalDialog.handler.find('#editUserPwdForm');
+                    f.submit();
+                }
+            };
+            pop("rbac/user/userEditPwd.html", "修改密码", null, null, saveButton, null, null);
+        }
+
+        window.closeAll = function () {
+            var tablist = $('#index_tabs').tabs('tabs');
+            for (var i = tablist.length - 1; i > 0; i--) {
+                $('#index_tabs').tabs('close', i);
+            }
+        }
+
+        window.closeOther = function () {
+            var tab = $('#index_tabs').tabs('getSelected');
+            var index = $('#index_tabs').tabs('getTabIndex', tab);
+            var tablist = $('#index_tabs').tabs('tabs');
+            for (var i = tablist.length - 1; i > 0; i--) {
+                if (i == index) continue;
+                $('#index_tabs').tabs('close', i);
+            }
+            $('#index_tabs').tabs('select', 1);
+        }
+
+        window.closeLeft = function () {
+            var tab = $('#index_tabs').tabs('getSelected');
+            var index = $('#index_tabs').tabs('getTabIndex', tab);
+            var tablist = $('#index_tabs').tabs('tabs');
+            for (var i = index - 1; i > 0; i--) {
+                $('#index_tabs').tabs('close', i);
+            }
+            $('#index_tabs').tabs('select', 1);
+        }
+
+        window.closeRight = function () {
+            var tab = $('#index_tabs').tabs('getSelected');
+            var index = $('#index_tabs').tabs('getTabIndex', tab);
+            var tablist = $('#index_tabs').tabs('tabs');
+            for (var i = tablist.length - 1; i > index; i--) {
+                $('#index_tabs').tabs('close', i);
+            }
+        }
+    });
+
+    function selfHandler(item) {
+        if (item.name == 'logout') {
+            logout();
+        }
+        else if (item.name == 'editUserPwd') {
+            editUserPwd();
+        }
+    }
+
+    // 更改字体大小
+    function fontSizeHandler(item) {
+        var name = item.name;
+        $.cookie('fontSize', name, {expires: 3000, path: "/"});
+        location.reload();
+    }
+
+    function tree() {
+        var tree = new Array();
+        store.get("resources").forEach(function (it) {
+            if (it.resourcetype == '0') {
+                var treeNode = new Object();
+                treeNode.id = it.mid;
+                treeNode.text = it.name;
+                if (it.pid == '0') {
+                    treeNode.state = 'closed';
+                } else {
+                    treeNode.state = 'open';
+                }
+                treeNode.pid = it.pid;
+                treeNode.iconCls = it.icon;
+                treeNode.attributes = {"url": it.url};
+                tree.push(treeNode);
+            }
+        });
+        $("#loading").hide();
+        return tree;
+    }
+
+    function gotoInfo(title, url, icon) {
+        addTab({
+            title: title,
+            url: url,
+            iconCls: icon
+        });
+    }
+</script>
+</body>
+</html>

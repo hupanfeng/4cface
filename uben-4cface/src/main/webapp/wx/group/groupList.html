@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <title>微信用户分组管理</title>
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'west',border:false,split:true" title="公众号"
+         style="width:200px;overflow: hidden;overflow-y:auto; ">
+        <ul id="appsTree" style="width:180px;margin: 10px 10px 10px 10px">
+            <li data-options="field:'name',sortable:true,width:80"></li>
+        </ul>
+    </div>
+    <div data-options="region:'center',border:false">
+        <table id="dataGrid">
+        </table>
+    </div>
+</div>
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    var appid = "";
+    loader.load('common', function () {
+        $(function () {
+            $.ajax({
+                type: "get",
+                url: store.get("context") + "/wx/group/dataApps",
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    var tree = new Array();
+                    result.rows.forEach(function (it) {
+                        var treeNode = new Object();
+                        treeNode.id = it.appid;
+                        treeNode.text = it.appName;
+                        tree.push(treeNode);
+                    });
+                    $('#appsTree').tree({
+                        data: tree,
+                        onClick: function (node) {
+                            appid = node.id;
+                            $("#dataGrid").datagrid({
+                                fit: true,
+                                border: false,
+                                pagination: false,
+                                url: "dataGrid?appid=" + node.id,
+                                rownumbers: true,
+                                singleSelect: true,
+                                toolbar: [
+                                    {text: '添加', iconCls: 'icon-add', handler: append},
+                                    {text: '保存到微信', iconCls: 'icon-save', handler: accept},
+                                    {text: '取消', iconCls: 'icon-redo', handler: reject},
+                                    {text: '从微信上同步', iconCls: 'icon-reload', handler: sync},
+                                ],
+                                columns: [[
+                                    {field: 'groupid', title: '微信分组ID', width: 100, align: 'center'},
+                                    {
+                                        field: 'name', title: '分组名称', width: 400, align: 'center',
+                                        editor: {
+                                            type: 'validatebox',
+                                            options: {required: true, validType: 'length[1,32]'}
+                                        }
+                                    },
+                                    {field: 'count', title: '用户数量', width: 100, align: 'center'},
+                                    /*{field: 'appid', title: '公众号ID', width: 100, align: 'left',
+                                     editor: {type: 'validatebox', options: {required: true, validType: 'length[1,32]'}}
+                                     }*/
+                                ]],
+                                onClickRow: function (index) {
+
+                                    //if (editIndex != index){
+                                    var gid = $('#dataGrid').datagrid('getRows')[index]['id'];
+                                    if (gid < 3) {
+                                        return;
+                                    }
+                                    if (endEditing()) {
+                                        $('#dataGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                                        editIndex = index;
+
+                                    } else {
+                                        $('#dataGrid').datagrid('selectRow', editIndex);
+                                    }
+                                    //}
+
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            $("#dataGrid").datagrid({
+                fit: true,
+                border: false,
+                pagination: false,
+                url: "dataGrid",
+                rownumbers: true,
+                singleSelect: true,
+                toolbar: [
+                    {text: '添加', iconCls: 'icon-add', handler: append},
+
+                    {text: '保存到微信', iconCls: 'icon-save', handler: accept},
+                    {text: '取消', iconCls: 'icon-redo', handler: reject},
+
+                ],
+                columns: [[
+                    {field: 'groupid', title: '微信分组ID', width: 100, align: 'center'},
+                    {
+                        field: 'name', title: '分组名称', width: 400, align: 'center',
+                        editor: {type: 'validatebox', options: {required: true, validType: 'length[1,32]'}}
+                    },
+                    {field: 'count', title: '用户数量', width: 100, align: 'center'},
+                    /*{field: 'appid', title: '公众号ID', width: 100, align: 'left',
+                     editor: {type: 'validatebox', options: {required: true, validType: 'length[1,32]'}}
+                     }*/
+                ]],
+                onClickRow: function (index) {
+
+                    //if (editIndex != index){
+                    var gid = $('#dataGrid').datagrid('getRows')[index]['id'];
+                    if (gid < 3) {
+                        return;
+                    }
+                    if (endEditing()) {
+                        $('#dataGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                        editIndex = index;
+
+                    } else {
+                        $('#dataGrid').datagrid('selectRow', editIndex);
+                    }
+                    //}
+
+                }
+            });
+        });
+    });
+    var editIndex = undefined;
+    function endEditing() {
+        if (editIndex == undefined) {
+            return true
+        }
+        if ($('#dataGrid').datagrid('validateRow', editIndex)) {
+            $('#dataGrid').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function edit() {
+        if (endEditing()) {
+            $('#dataGrid').datagrid('appendRow', {});
+            editIndex = $('#dataGrid').datagrid('getRows').length - 1;
+            $('#dataGrid').datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+        }
+    }
+
+
+    function append() {
+        if (endEditing()) {
+            $('#dataGrid').datagrid('appendRow', {});
+            editIndex = $('#dataGrid').datagrid('getRows').length - 1;
+            $("#dataGrid").datagrid("selectRow", editIndex).datagrid("beginEdit", editIndex);
+
+
+        }
+    }
+
+
+    function accept() {
+        if (endEditing()) {
+            var rows = $("#dataGrid").datagrid("getChanges");
+            if (rows.length <= 0) {
+                parent.$.messager.alert('提示', "数据未发生变化", 'info');
+                return;
+            }
+            parent.$.messager.confirm('保存确认', '您是否要同步数据到服务器', function (b) {
+                if (b) {
+                    //  add busi code here
+                    for (var i = 0; i < rows.length; i++) {
+                        progressLoad("正在保存第" + (i + 1) + "项");
+                        doSave(rows[i]);
+
+                    }
+                    progressClose();
+                    $('#dataGrid').datagrid('reload');
+                }
+            });
+        }
+    }
+    function doSave(obj) {
+        if (!appid) {
+            parent.$.messager.alert('提示', "没有选取公众号", 'info');
+            return;
+        }
+        var url = "add?appid=" + appid;
+        /*  if (!obj["id"] || obj["id"].length == 0) {
+         url = parent.$.modalDialog.path + "add";
+         }*/
+        $.ajax({
+            url: url,
+            dataType: "json",
+            data: obj,
+            async: false,
+            type: "POST",
+            success: function () {
+                return true;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.readyState);
+                $('#dataGrid').datagrid('selectRow', editIndex);
+                return false;
+            }
+        });
+    }
+    function sync() {
+        progressLoad("正在同步...");
+        $.ajax({
+            url: "add?appid=" + appid,
+            type: "get",
+            dataType: "json",
+            success: function () {
+                parent.$.messager.alert('提示', "同步完成", 'info');
+                $('#dataGrid').datagrid('reload');
+                progressClose();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                progressClose();
+                alert(XMLHttpRequest.readyState);
+            }
+        });
+    }
+    function reject() {
+        $('#dataGrid').datagrid('rejectChanges');
+        editIndex = undefined;
+    }
+
+</script>
+</body>
+</html>

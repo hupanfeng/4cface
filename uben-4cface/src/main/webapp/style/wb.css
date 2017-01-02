@@ -1,0 +1,147 @@
+/**{font-size:16px !important;}*/
+body {font-family:helvetica,tahoma,verdana,sans-serif;padding:20px;margin:0;}
+h2 {font-size:18px;font-weight:bold;margin:0;margin-bottom:15px;}
+
+.grid {
+    border: 1px solid #8DB2E3;
+    font: 12px arial,helvetica,sans-serif;
+}
+.grid td {
+    font: 100% arial,helvetica,sans-serif;
+    height: 40px;
+    padding: 5px 15px;
+}
+.grid {
+    border-collapse: collapse;
+    width: 100%;
+}
+.grid th {
+    background: none repeat scroll 0 0 #E7F3FE;
+    border: 1px solid #8DB2E3;
+    height: 27px;
+    line-height: 27px;
+    padding-left: 5px;
+}
+.grid td {
+    border: 1px solid #8DB2E3;
+   /* padding-left: 5px;*/
+}
+
+#layout_west_tree li ul li div{padding:7px 5px 7px 5px;}
+#layout_west_tree li div{padding:7px 5px 7px 10px;}
+
+#header{overflow:hidden;height:69px;line-height:64px;color:#fff;font-family:Verdana,'Microsoft YaHei';  }
+.header{background: url(images/index/logo2.png) no-repeat 15px; width: 510px; height: 64px;background-size:45px; float: left; margin-top:1px; margin-left:3px; }
+.header h1 {color:#fff;font-size:25px; text-indent:70px; margin-top:0px; text-shadow: 0px 0px 1px #fff; letter-spacing: 1px; font-weight: normal}
+#header a {color:#fff;}
+
+
+.wb-info{background:#FFFEE6;color:#8F5700;padding:12px;}
+.wd-tip{width:16px;height:16px;margin-right:8px;float:left;}
+
+.icon_search{background: url('images/ext/search.png') no-repeat center center;}
+.icon_cancel{background: url('images/ext/cancel.png') no-repeat center center;}
+.icon_company{background: url('images/ext/company.png') no-repeat center center;}
+.icon_dic{background: url('images/ext/dic.png') no-repeat center center;}
+.icon_folder{background: url('images/ext/folder.png') no-repeat center center;}
+.icon_add{background: url('images/ext/add.png') no-repeat center center;}
+.icon_home{background: url('images/ext/home.png') no-repeat center center;}
+.icon_refresh{background: url('images/ext/refresh.png') no-repeat center center;}
+.icon_org{background: url('images/ext/org.png') no-repeat center center;}
+.icon_resource{background: url('images/ext/resource.png') no-repeat center center;}
+.icon_role{background: url('images/ext/role.png') no-repeat center center;}
+.icon_user{background: url('images/ext/user.png') no-repeat center center;}
+.icon_del{background: url('images/ext/del.png') no-repeat center center;}
+.icon_sys {background: url('images/ext/sys1.png') no-repeat center center;}
+.icon_wx {background: url('images/ext/wx.png') no-repeat center center;}
+.icon_log {background: url('images/ext/log.png') no-repeat center center;}
+.icon_security {background: url('images/ext/security.png') no-repeat center center;}
+.icon_app {background: url('images/ext/app.png') no-repeat center center;}
+.icon_book {background: url('images/ext/book.png') no-repeat center center;}
+.icon_monitor {background: url('images/ext/monitor.png') no-repeat center center;}
+
+.icon2 {
+    background: url(tabicons.png) no-repeat;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+.icon2_set {background: url('images/tabicons.png') no-repeat;background-position: -20px -100px;}
+.icon2_wfrole {background: url('images/tabicons.png') no-repeat;background-position: -360px -200px;}
+.icon2_factory {background: url('images/tabicons.png') no-repeat;background-position: -320px -80px;}
+.icon2_wf {background: url('images/tabicons.png') no-repeat;background-position: -160px -40px;}
+.icon2_task {background: url('images/tabicons.png') no-repeat;background-position: -240px -40px;}
+.icon2_do {background: url('images/tabicons.png') no-repeat;background-position: -280px -40px;}
+.icon2_data{background: url('images/tabicons.png') no-repeat;background-position: -280px -80px;}
+.icon2_ck{background: url('images/tabicons.png') no-repeat;background-position: -220px -160px;}
+.icon2_rk{background: url('images/tabicons.png') no-repeat;background-position: -200px -160px;}
+.icon2_wx{background: url('images/tabicons.png') no-repeat;background-position: -0px -220px;}
+.icon2_bf{background: url('images/tabicons.png') no-repeat;background-position: -140px -120px;}
+.icon2_cz{background: url('images/tabicons.png') no-repeat;background-position: -0px -140px;}
+.icon2_ryx{background: url('images/tabicons.png') no-repeat;background-position: -240px -80px;}
+.icon2_rjl{background: url('images/tabicons.png') no-repeat;background-position: -320px -340px;}
+.icon2_rzc{background: url('images/tabicons.png') no-repeat;background-position: -240px -80px;}
+.icon2_rgd{background: url('images/tabicons.png') no-repeat;background-position: -320px -340px;}
+.icon2_rcz{background: url('images/tabicons.png') no-repeat;background-position: -240px -80px;}
+.icon2_rzl{background: url('images/tabicons.png') no-repeat;background-position: -320px -340px;}
+.icon2_rjx{background: url('images/tabicons.png') no-repeat;background-position: -240px -80px;}
+.icon2_rqc{background: url('images/tabicons.png') no-repeat;background-position: -320px -340px;}
+.icon2_jlgl{background: url('images/tabicons.png') no-repeat;background-position: -180px -100px;}
+.icon2_imp{background: url('images/tabicons.png') no-repeat;background-position: -140px -60px;}
+.icon2_exp{background: url('images/tabicons.png') no-repeat;background-position: -100px -60px;}
+.icon2_print{background: url('images/tabicons.png') no-repeat;background-position: -240px -340px;}
+.icon2_message{background: url('images/tabicons.png') no-repeat;background-position: -100px -200px;}
+.icon2_sign{background: url('images/tabicons.png') no-repeat;background-position: -260px -300px;}
+.icon2_jlgx{background: url('images/tabicons.png') no-repeat;background-position: -60px -0px;}
+.icon2_mantance{background: url('images/tabicons.png') no-repeat;background-position: -380px -200px;}
+.icon2_viewBase{background: url('images/tabicons.png') no-repeat;background-position: -80px -240px;}
+.icon2_jdjy{background: url('images/tabicons.png') no-repeat;background-position: -60px -260px;}
+.icon2_zcpd{background: url('images/tabicons.png') no-repeat;background-position: -380px -80px;}
+.icon2_switch{background: url('images/tabicons.png') no-repeat;background-position: -260px -100px;}
+.icon2_msg{background: url('images/tabicons.png') no-repeat;background-position: -100px -100px;}
+.icon2_home{background: url('images/tabicons.png') no-repeat;background-position: -200px -220px;}
+.icon2_chart{background: url('images/tabicons.png') no-repeat;background-position: -320px -80px;}
+.icon2_bulb{background: url('images/tabicons.png') no-repeat;background-position: -300px -240px;}
+.icon2_note{background: url('images/tabicons.png') no-repeat;background-position: -160px -160px;}
+.icon2_edit{background: url('images/tabicons.png') no-repeat;background-position: -100px -300px;}
+.icon2_delete{background: url('images/tabicons.png') no-repeat;background-position: -160px -80px;}
+.icon2_view{background: url('images/tabicons.png') no-repeat;background-position: -80px -200px;}
+.icon2_form{background: url('images/tabicons.png') no-repeat;background-position: -60px -240px;}
+.icon2_update{background: url('images/tabicons.png') no-repeat;background-position: -140px -40px;}
+.icon2_block{background: url('images/tabicons.png') no-repeat;background-position: -220px -340px;}
+.icon2_dashboard{background: url('images/tabicons.png') no-repeat;background-position: -360px -120px;}
+.icon2_dashboard2{background: url('images/tabicons.png') no-repeat;background-position: -120px -100px;}
+.icon2_oprationlog{background: url('images/tabicons.png') no-repeat;background-position: -220px -320px;}
+.icon2_lcgl{background: url('images/tabicons.png') no-repeat;background-position: -40px -40px;}
+.icon2_sccj{background: url('images/tabicons.png') no-repeat;background-position: -20px -140px;}
+.icon2_yxgl{background: url('images/tabicons.png') no-repeat;background-position: -260px -80px;}
+.icon2_yxqk{background: url('images/tabicons.png') no-repeat;background-position: -60px -400px;}
+.icon2_jlgl2{background: url('images/tabicons.png') no-repeat;background-position: -40px -360px;}
+.icon2_zjbd{background: url('images/tabicons.png') no-repeat;background-position: -140px -400px;}
+.icon2_qcpd{background: url('images/tabicons.png') no-repeat;background-position: -340px -300px;}
+.icon2_czmx{background: url('images/tabicons.png') no-repeat;background-position: -0px -220px;}
+.icon2_cxsy{background: url('images/tabicons.png') no-repeat;background-position: -380px -240px;}
+.icon2_bfcx{background: url('images/tabicons.png') no-repeat;background-position: 0px -100px;}
+.icon2_zcdb{background: url('images/tabicons.png') no-repeat;background-position: -210px -140px;}
+.icon2_zcdb{background: url('images/tabicons.png') no-repeat;background-position: -210px -140px;}
+.icon2_ndwx{background: url('images/tabicons.png') no-repeat;background-position: -220px -320px;}
+.icon2_zjpd{background: url('images/tabicons.png') no-repeat;background-position: -120px -300px;}
+.tick{background: url('images/icon_tick.png') no-repeat;background-position: 50% 50%;}
+.bullet_blue{background: url('images/icon_bullet_blue.png') no-repeat;background-position: 50% 50%;}
+
+fieldset { border-radius:5px; border:1px solid #888; }
+fieldset legend { color:#275cf1; }
+.option-btn a { padding:3px 5px; margin:0 5px; } 
+legend {
+	/*width:none;*/
+	border:0;
+}
+.icon_base {
+    display: inline-block;
+    margin-right: 10px;
+    width: 23px;
+    height: 23px;
+}

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <title>模板管理</title>
+</head>
+<body>
+
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'west',border:false,split:true" title="公众号"
+         style="width:200px;overflow: hidden;overflow-y:auto; ">
+        <ul id="appsTree" style="width:180px;margin: 10px 10px 10px 10px">
+            <li data-options="field:'name',sortable:true,width:80"></li>
+        </ul>
+    </div>
+
+    <div data-options="region:'center',border:false">
+        <table id="dataGrid"></table>
+    </div>
+</div>
+<!--<div id="tb" style="padding:3px">
+    <span>昵称:</span>
+    <input id="form_name" class="easyui-textbox" style="border:1px solid #ccc;width:100px">
+    <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_search',plain:true"
+       onclick="doSearch();">查询</a>&nbsp;
+    <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_cancel',plain:true"
+       onclick="clearSearch();">清空</a>
+</div>-->
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    var appid = "";
+    loader.load('common', function () {
+        $(function () {
+            $.ajax({
+                type: "get",
+                url:  "temApps",
+                cache: false,
+                dataType: "json",
+                success: function (result) {
+                    var tree = new Array();
+                    result.rows.forEach(function (it) {
+                        var treeNode = new Object();
+                        treeNode.id = it.appid;
+                        treeNode.text = it.appName;
+                        tree.push(treeNode);
+                    });
+                    $('#appsTree').tree({
+                        data: tree,
+                        onClick: function (node) {
+                            result.rows.forEach(function (it) {
+                                appid = node.id;
+                                $('#dataGrid').datagrid({
+                                    fit: true,
+                                    border: false,
+                                    pagination: true,
+                                    idField: 'mid',
+                                    url: "dataGrid?appid=" + node.id,
+                                    queryParams: {
+                                        nickName: $('#form_name').val()
+                                    },
+                                    onBeforeLoad: function (param) {
+                                    },
+                                    remoteSort: true,
+                                    sortName: "mid",
+                                    sortOrder: "asc",
+                                    rownumbers: true,
+                                    pagePosition: 'bottom',
+                                    pageNumber: 1,
+                                    pageSize: 50,
+                                    pageList: [5, 10, 30, 50, 100],
+                                    singleSelect: true,
+                                    toolbar: [
+                                        /*{text: '添加', iconCls: 'icon-add', handler: append},
+                                        {text: '删除', iconCls: 'icon-remove', handler: removeit},*/
+                                        {text: '保存到微信', iconCls: 'icon-save', handler: accept},
+                                        {text: '取消', iconCls: 'icon-redo', handler: reject},
+                                        {text: '从微信上同步', iconCls: 'icon-reload', handler: sync},
+                                    ],
+                                    columns: [[
+                                        {
+                                            field: 'mid',
+                                            title: 'mid',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'left',
+                                            checkbox: true
+                                        },
+                                        {
+                                            field: 'template_id', title: '模板id', width: 270, align: 'left',
+
+                                        },
+
+                                        {field: 'title', title: '模板标题', sortable: true, width: 150, align: 'center'},
+                                        {
+                                            field: 'primary_industry',
+                                            title: '一级行业',
+                                            sortable: true,
+                                            width: 80,
+                                            align: 'center',
+
+                                        },
+                                        {
+                                            field: 'deputy_industry',
+                                            title: '二级行业',
+                                            sortable: true,
+                                            width: 100,
+                                            align: 'left',
+                                            hidden: true
+                                        },
+                                        {field: 'content', title: '模板内容', sortable: true, width: 400, align: 'left'},
+                                        {field: 'example', title: '模板示例', sortable: true, width: 400, align: 'left'},
+                                        {
+                                            field: 'action', title: '操作', sortable: true, width: 100, align: 'center',
+                                            formatter: function (value, row, index) {
+                                                var object = {};
+                                                if (isPermit("edit")) {
+                                                    object["unlock"] = {
+                                                        "func": "groupFun",
+                                                        "paramid": row.mid + "," + "js",
+                                                        "name": "展示详情"
+                                                    };
+                                                }
+                                                return pubAction(object);
+                                            }
+
+                                        },
+                                    ]],
+                                    onDblClickRow: function (index, rowdata) {
+
+                                        if (editIndex != index) {
+                                            if (endEditing()) {
+                                                $('#dataGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                                                editIndex = index;
+                                            } else {
+                                                $('#dataGrid').datagrid('selectRow', editIndex);
+                                            }
+                                        }
+
+                                    }
+                                });
+                                $('#tb').appendTo('.datagrid-toolbar');
+                            });
+
+                        }
+                    });
+                }
+            });
+            $('#dataGrid').datagrid({
+                fit: true,
+                border: false,
+                pagination: true,
+                idField: 'mid',
+                url: "dataGrid",
+                queryParams: {
+                    nickname: $('#form_name').val()
+                },
+                onBeforeLoad: function (param) {
+                },
+                remoteSort: true,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagePosition: 'bottom',
+                pageNumber: 1,
+                pageSize: 50,
+                pageList: [5, 10, 30, 50, 100],
+                singleSelect: true,
+                columns: [[
+                    {
+                        field: 'mid',
+                        title: 'mid',
+                        sortable: true,
+                        width: 100,
+                        align: 'left',
+                        checkbox: true
+                    },
+                    {
+                        field: 'template_id', title: '模板id', width: 270, align: 'left',
+
+                    },
+
+                    {field: 'title', title: '模板标题', sortable: true, width: 150, align: 'center'},
+                    {
+                        field: 'primary_industry', title: '一级行业', sortable: true, width: 80, align: 'center',
+
+                    },
+                    {
+                        field: 'deputy_industry',
+                        title: '二级行业',
+                        sortable: true,
+                        width: 100,
+                        align: 'left',
+                        hidden: true
+                    },
+                    {field: 'content', title: '模板内容', sortable: true, width: 400, align: 'left'},
+                    {field: 'example', title: '模板示例', sortable: true, width: 400, align: 'left'},
+                    {
+                        field: 'action', title: '操作', sortable: true, width: 100, align: 'center',
+                        formatter: function (value, row, index) {
+                            var object = {};
+                            if (isPermit("edit")) {
+                                object["unlock"] = {
+                                    "func": "groupFun",
+                                    "paramid": row.mid + "," + "js",
+                                    "name": "展示详情"
+                                };
+                            }
+                            return pubAction(object);
+                        }
+
+                    },
+                ]],
+                onDblClickRow: function (index, rowdata) {
+
+                    if (editIndex != index) {
+                        if (endEditing()) {
+                            $('#dataGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                            editIndex = index;
+                        } else {
+                            $('#dataGrid').datagrid('selectRow', editIndex);
+                        }
+                    }
+
+                }
+            });
+            $('#tb').appendTo('.datagrid-toolbar');
+        });
+    });
+    window.groupFun = function (param) {
+        var ids = param.split(",");
+        var mid = ids[0];
+        var type = ids[1];
+        if (!param) {
+            return;
+        }
+        if (type && type == 'js') {
+            var data = {
+                id: mid
+            };
+            console.log(data);
+            pop("template.html", "展示", 300, null, null, data);
+        }
+    }
+    var editIndex = undefined;
+    function endEditing() {
+        if (editIndex == undefined) {
+            return true
+        }
+        if ($('#dataGrid').datagrid('validateRow', editIndex)) {
+            $('#dataGrid').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            parent.showToast('error', "您有信息未填写完善");
+            return false;
+        }
+    }
+    function doSearch() {
+        var form_id = $('#form_name').val();
+        $('#dataGrid').datagrid('load', {
+            nickname: form_id
+        });
+    }
+    function clearSearch() {
+        $('#form_name').textbox('setValue', '');
+        $('#dataGrid').datagrid('load', {});
+    }
+
+    function append() {
+        if (endEditing()) {
+            $('#dataGrid').datagrid('appendRow', {});
+            editIndex = $('#dataGrid').datagrid('getRows').length - 1;
+            $('#dataGrid').datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+        }
+    }
+    function accept() {
+        if (endEditing()) {
+            var rows = $('#dataGrid').datagrid('getChanges');
+
+            if (rows.length <= 0) {
+                parent.$.messager.alert('提示', "数据未发生变化", 'info');
+                return;
+            }
+            parent.$.messager.confirm('保存确认', '您是否要同步数据到服务器', function (b) {
+                if (b) {
+                    //  add busi code here
+                    for (var i = 0; i < rows.length; i++) {
+                        progressLoad("正在保存第" + (i + 1) + "项");
+                        doSave(rows[i]);
+
+                    }
+                    progressClose();
+                    $('#dataGrid').datagrid('reload');
+                    $('#dataGrid').datagrid('unselectAll');
+                    editIndex = undefined;
+                }
+            });
+        }
+    }
+    function doSave(obj) {
+        /* var url = "edit";
+         if(!obj["id"] || obj["id"].length==0) {
+         url = "/ctl/vsmsWxFans/add" ;
+         }*/
+        $.ajax({
+            url: url,
+            dataType: "json",
+            data: obj,
+            async: false,
+            type: "POST",
+            success: function () {
+                return true;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.readyState);
+                $('#dataGrid').datagrid('selectRow', editIndex);
+                return false;
+            }
+        });
+    }
+    function reject() {
+        $('#dataGrid').datagrid('rejectChanges');
+        $('#dataGrid').datagrid('unselectAll');
+        editIndex = undefined;
+    }
+
+    function removeit() {
+        if (endEditing()) {
+            parent.$.messager.confirm('删除确认', '您是否要删除当前记录', function (b) {
+                if (b) {
+                    var obj = $('#dataGrid').datagrid('getSelected');
+                    var _json = $.param({"id": obj["id"]});
+                    $.ajax({
+                        url: "delete",
+                        dataType: "json",
+                        data: _json,
+                        type: "POST",
+                        success: function () {
+                            $('#dataGrid').datagrid('reload');
+                            editIndex = undefined;
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert(XMLHttpRequest.readyState);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+
+    function sync() {
+        progressLoad("正在同步...");
+        $.ajax({
+            url: "add?appid=" + appid,
+            type: "get",
+            dataType: "json",
+            success: function () {
+                parent.$.messager.alert('提示', "同步完成", 'info');
+                $('#dataGrid').datagrid('reload');
+                progressClose();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                progressClose();
+                alert(XMLHttpRequest.readyState);
+            }
+        });
+    }
+
+    function refresh() {
+        $("#dataGrid").datagrid('reload');
+    }
+
+</script>
+</body>
+</html>

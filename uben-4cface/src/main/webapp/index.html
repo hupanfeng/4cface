@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>井下作业修井工具数据库系统</title>
+    <link rel="stylesheet" type="text/css" href="style/base.css"/>
+    <link rel="stylesheet" type="text/css" href="style/page.css"/>
+    <link rel="stylesheet" type="text/css" href="style/index.css"/>
+    <link rel="stylesheet" type="text/css" href="style/alertify.default.min.css"/>
+    <link rel="stylesheet" type="text/css" href="style/alertify.min.css"/>
+    <script src="js/kkpager.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/lib/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/lib/alertify.min.js" type="text/javascript" charset="utf-8"></script>
+    <!-- 引入AngularJs,支持IE8 -->
+    <script src="js/lib/angular1.2.29/angular.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body ng-app="indexApp" ng-controller="IndexCtrl">
+<div class="header">
+    <div class="wrap">
+        <div class="fl logo">
+            <a href="index.html"><img src="style/images/index/logo.png" alt=""/></a>
+            <h1>井下作业修井工具数据库系统</h1>
+        </div>
+        <div class="fl head_form">
+            <input type="text" ng-model="search" class="text" id="form_text"/>
+            <input type="button" class="button" value="" onclick="doSearch('init')"/>
+        </div>
+        <a href="login.html" class="login" style="text-decoration: none">登录</a>
+    </div>
+</div>
+<!--container-->
+<div class="container">
+    <div class="wrap">
+        <div class="fl con_tree">
+            <ul class="con_tree_list" id="tree_list">
+                <li><strong>工具分类</strong></li>
+                <li ng-repeat="ele in CategoryData" category-li-hover category-click id="{{ele.mid}}">
+                    <span>{{ele.categoryName}}</span>
+                    <div class="left_menu" ng-repeat="subele in ele.subCategorys">
+                        <a href="javascript:void(0);" category-click id="{{subele.mid}}">{{ subele.categoryName }}</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="fr con_main">
+            <ul class="con_main_list" id="con_main_list">
+            </ul>
+            <!--分页-->
+            <div id="kkpager"></div>
+            <!--end-->
+        </div>
+    </div>
+</div>
+<!--<div class="footer">
+    <div class="wrap">
+        技术支持：重庆伍犇科技有限公司
+    </div>
+</div>-->
+</body>
+</html>
+<script>
+    var category = "";
+    var app = angular.module('indexApp', []);
+    var pageSize = 10;
+    var currentPage = 1;//当前页码
+    if (!currentPage) {
+        currentPage = 1;
+    }
+    var totalPage = 1;//总页数
+    var totalRecords = 0;//总记录条数
+
+    app.controller('IndexCtrl', function ($scope, $http) {
+        $http.get("toolcategory/list").then(function (response) {
+            var rows = new Array();
+            $.each(response.data, function (i, o) {
+                if (o.pid == 0) {
+                    rows.push(o);
+                }
+            });
+            $scope.CategoryData = rows;
+        });
+        doDoc(null, 'init');
+    });
+    app.directive('categoryLiHover', function () {
+        return {
+            restrict: "A",
+            link: function (scope, elem, attrs) {
+                $(elem).hover(function () {
+                    $(elem).find('div').stop().slideDown(800);
+                    $(elem).find('span').addClass('active');
+                }, function () {
+                    $(elem).find('div').stop().slideUp(800);
+                    $(elem).find('span').removeClass('active');
+                });
+            }
+        }
+    });
+    app.directive('categoryClick', function () {
+        return {
+            restrict: "A",
+            link: function (scope, elem, attrs) {
+                $(elem).click(function () {
+                    if ($(elem).context.tagName == "A") {
+                        $($(elem).context.parentNode.parentNode).unbind("click");
+                        setTimeout(function () {
+                            $($(elem).context.parentNode.parentNode).bind("click", function () {
+                                category = $($(elem).context.parentNode.parentNode).attr('id');
+                                doDoc(category, 'init');
+                            });
+                        }, 500);
+                    }
+                    category = $(elem).attr('id');
+                    doDoc(category, 'init');
+                });
+            }
+        }
+    });
+    //    app.directive('searchChange', function () {
+    //        return {
+    //            restrict: "A",
+    //            link: function (scope, elem, attrs) {
+    //                $(elem).change(function () {
+    //                    doSearch();
+    //                });
+    //            }
+    //        }
+    //    });
+    function gotoDocInfo(id) {
+        $("#con_main_list").html('');
+        currentPage = 1;
+        window.location.href = "docInfo.html?id=" + id;
+    }
+
+    function doSearch(flag) {
+        var key = $("#form_text").val();
+        if (!key || key == '') {
+            if ((navigator.userAgent.indexOf('MSIE')) >= 0 && (navigator.userAgent.indexOf('Opera') < 0)) {
+                alert("请输入查询内容");
+            } else {
+                alertify.error("请输入查询内容");
+            }
+            return false;
+        }
+        if (flag == 'init') {
+            $("#kkpager").html("");
+            currentPage = 1;
+            totalRecords = 0;
+            totalPage = 1;
+        }
+        $.ajax({
+            type : "post",
+            url: "search/grid",
+            dataType: "json",
+            data: "key=" + key + "&category=" + category + "&pageSize=" + pageSize + "&currentPage=" + 1,
+            success: function (data) {
+                totalRecords = data.total;
+                totalPage = Math.ceil((totalRecords) / pageSize);
+                $("#con_main_list").html("");
+                var htmltext = "";
+                for (var i = 0; i < data.rows.length; i++) {
+                    var pic = data.rows[i].docpic;
+                    htmltext += '<li>';
+                    htmltext += '<h2><span target="_blank" onclick="gotoDocInfo(' + data.rows[i].mid + ')">' + data.rows[i].title + '</span></h2>';
+                    if (pic) {
+//                        pic = "http://test.5ben.com.cn/" + pic.substr(1);
+                        htmltext += '<span class="fl con_main_img" onclick="gotoDocInfo(' + data.rows[i].mid + ')">';
+                        htmltext += '<img src="' + pic + '" alt="" /></span>';
+                    }
+                    htmltext += '<font class="con_main_zy">' + data.rows[i].summary + '</font>';
+                    htmltext += '<p class="con_main_icon clr">';
+                    htmltext += '</p>';
+                    htmltext += '</div>';
+                    htmltext += '</li>';
+                }
+                $("#con_main_list").html(htmltext);
+                kkpager.generPageHtml({
+                    pno: currentPage,
+                    total: totalPage,
+                    totalRecords: totalRecords,
+                    mode: 'click',//默认值是link，可选link或者click
+                    click: function (n) {
+                        $("#con_main_list").html("");
+                        this.selectPage(n);
+                        currentPage = n;
+                        doSearch('none');
+                    }
+                }, true);
+            }
+        });
+    }
+    function doDoc(category, flag) {
+        if (flag == "init") {
+            $("#kkpager").html("");
+            currentPage = 1;
+            totalRecords = 0;
+            totalPage = 1;
+        }
+        var url = "";
+        if (category) {
+            url = "doc/dataGrid?categoryId=" + category;
+        } else {
+            url = "doc/dataGrid";
+        }
+        $.ajax({
+            url: url,
+            dataType: "json",
+            data: "&pageSize=" + pageSize + "&currentPage=" + currentPage,
+            success: function (data) {
+                totalRecords = data.total;
+                totalPage = Math.ceil((totalRecords) / pageSize);
+                var htmltext = "";
+                $("#con_main_list").html("");
+                $("#kkpager").html("");
+                var htmltext = "";
+                for (var i = 0; i < data.rows.length; i++) {
+                    var pic = data.rows[i].docpic;
+                    htmltext += '<li>';
+                    if ((navigator.userAgent.indexOf('MSIE')) >= 0 && (navigator.userAgent.indexOf('Opera') < 0)) {
+                        htmltext += '<h2><span href="javascript:void(0);" target="_blank" onclick="gotoDocInfo(' + data.rows[i].mid + ')">' + data.rows[i].title + '</span></h2>';
+                    }else{
+                        htmltext += '<h2><a href="javascript:void(0);" target="_blank" onclick="gotoDocInfo(' + data.rows[i].mid + ')">' + data.rows[i].title + '</a></h2>';
+                    }
+
+                    if (pic) {
+//                        pic = "http://test.5ben.com.cn/" + pic.substr(1);
+                        htmltext += '<span class="fl con_main_img" onclick="gotoDocInfo(' + data.rows[i].mid + ')">';
+                        htmltext += '<img src="' + pic + '" alt="" width="150" height="80" /></span>';
+                    }
+                    htmltext += '<font class="con_main_zy">' + data.rows[i].summary + '</font>';
+                    htmltext += '<p class="con_main_icon clr">';
+                    htmltext += '</p>';
+                    htmltext += '</div>';
+                    htmltext += '</li>';
+                }
+                $("#con_main_list").html(htmltext);
+                kkpager.generPageHtml({
+                    pno: currentPage,
+                    total: totalPage,
+                    totalRecords: totalRecords,
+                    mode: 'click',//默认值是link，可选link或者click
+                    click: function (n) {
+                        $("#con_main_list").html("");
+                        this.selectPage(n);
+                        currentPage = n;
+                        doDoc(category, 'none');
+                    }
+                }, true);
+            }
+        });
+    }
+    $(
+            function () {
+
+                $("#form_text").keyup(function (event) {
+                    //此外也可以直接搜索
+                    //doSearch();
+                    //setTimeout防止某些情况下浏览器卡死
+                    if (event.keyCode == "13") {
+                        setTimeout("doSearch('init');", 50);
+                    }
+                });
+            }
+    );
+
+</script>

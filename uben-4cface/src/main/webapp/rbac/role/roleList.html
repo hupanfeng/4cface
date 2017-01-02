@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="../../style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <title>角色管理</title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'center',border:false">
+    <table id="dataGrid" class="easyui-treegrid">
+        <thead>
+        <tr>
+            <th data-options="field:'name',sortable:true,width:200,align:'left'">名称</th>
+            <th data-options="field:'description',align:'left',width:350">描述</th>
+            <th data-options="field:'action',width:150,align:'center'" formatter="showaction">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<div id="toolbar" style="display: none;">
+    <a resource="add" onclick="add('role.html','角色',600,350) ;" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-add'">添加</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="edit" onclick="edit(null,'role.html','角色',600,350);" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-edit'">修改</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="delete" onclick="del(null,'delete');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">删除</a>
+</div>
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    loader.load('common', function () {
+        $(function () {
+            $("#dataGrid").treegrid({
+                toolbar: "#toolbar",
+                url: "dataGrid",
+                idField: "mid",
+                treeField: "name",
+                fitColumns: "true",
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: false,
+                pagination: false,
+                singleSelect: "true",
+                onDblClickRow: function (rowdata) {
+                    if (isPermit("edit")) {
+                        edit(rowdata.mid, 'role.html', '角色',600,350);
+                    }
+                }
+            });
+            $("#toolbar").find("a").each(function () {
+                var resource = $(this).attr("resource");
+                if (!isPermit(resource)) {
+                    $(this).hide();
+                    $(this).next().remove();
+                }
+            });
+        });
+    });
+    function showaction(value, row, index) {
+        var object = {};
+        if (isPermit("edit")) {
+            object["grant"] = {
+                "func": "grantFun",
+                "paramid": row.mid + "," + row.pid + "," + row._parentId,
+                "name": "授权"
+            };
+        }
+        return pubAction(object);
+    }
+    function grantFun(paramid) {
+        var ids = paramid.split(",");
+        var mid = ids[0];
+        var pid = ids[1];
+        var _parentId = ids[2];
+        if (!_parentId || _parentId == 0 || _parentId == "undefined") {
+            parent.$.messager.alert('提示', '不能给自己的角色授权', 'info');
+            return;
+        }
+//        var roles = store.get("user").roles;
+//        for(var i in roles){
+//            if(roles[i] == mid){
+//                parent.$.messager.alert('提示', '不能给自己的角色授权', 'info');
+//                return false;
+//            }
+//        }
+        if (pid == undefined || mid == undefined) {
+            return;
+        }
+        var saveButton = {
+            text: '授权',
+            iconCls: 'icon-ok',
+            handler: function () {
+                var f = parent.$.modalDialog.handler.find('#roleGrantForm');
+                f.submit();
+            }
+        };
+        var data = {
+            pid: pid,
+            mid: mid
+        };
+        pop("roleGrant.html", "授权", null, null, saveButton, data);
+    }
+    function refresh() {
+        $("#dataGrid").treegrid('reload');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="/style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <title>缓存管理</title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'north',border:false" class="editBox-inputs">
+    <form id="searchForm">
+       <!-- <span class="datagrid-btn-separator"></span>
+        <strong>缓存名称:</strong><input name="actionName" placeholder="请输入缓存名称" class="easyui-textbox"/>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" style="padding: 0 20px;"
+           data-options="iconCls:'icon_search'" onclick="ubenSearch();">查询</a>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_cancel',plain:true"
+           onclick="ubenClean();">清空</a>-->
+    </form>
+</div>
+<div data-options="region:'center',border:false">
+    <table id="dataGrid" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'name',sortable:true,align:'center',width:150">缓存名称</th>
+            <th data-options="field:'size',sortable:true,align:'center',width:80">条目数</th>
+            <th data-options="field:'hitRatio',sortable:true,align:'center',width:80">命中率(%)</th>
+            <th data-options="field:'hitCount',sortable:true,align:'center',width:80">命中数</th>
+            <th data-options="field:'missCount',sortable:true,align:'center',width:80">丢失数</th>
+            <th data-options="field:'heapItems',align:'center',width:80">堆内条目数</th>
+            <th data-options="field:'heapSize',align:'center',width:150">堆内内存使用量(单位:字节)</th>
+            <th data-options="field:'offHeapItems',align:'center',width:80">堆外条目数</th>
+            <th data-options="field:'offHeapSize',align:'center',width:150">堆外内存使用量(单位:字节)</th>
+            <th data-options="field:'diskItems',align:'center',width:80">硬盘条目数</th>
+            <th data-options="field:'diskSize',align:'center',width:150">硬盘内存使用量(单位:字节)</th>
+            <th data-options="field:'action',width:150,align:'center'" formatter="showAction">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    loader.load('common', function () {
+        $(function () {
+            $("#dataGrid").datagrid({
+                toolbar: "#toolbar",
+                url: "dataGrid",
+                remoteSort: true,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagination: false,
+                pagePosition: "bottom",
+                pageList: [50, 100, 200, 500],
+                pageSize: 100,
+                singleSelect: "true",
+                onBeforeLoad: function (param) {
+                    param["pageSize"] = param.rows;
+                    param["currentPage"] = param.page;
+                    delete param.rows;
+                    delete param.page;
+                }
+            });
+        });
+    });
+
+    function showAction(value, row, index) {
+        var object = {};
+        if (isPermit("clear")) {
+            object["clear"] = {"func": "clearCache", "paramid": row.name, "name": "清空"};
+        }
+        return pubAction(object);
+    }
+
+    function clearCache(param) {
+        $.ajax({
+            type: "post",
+            url: "clear",
+            dataType: "json",
+            data: {
+                cacheName: param
+            },
+            cache: false,
+            success: function (result) {
+                if (result.success) {
+                    parent.$.messager.alert('成功', result.msg, 'info');
+                    refresh();
+                } else {
+                    parent.$.messager.alert('错误', result.msg, 'error');
+                }
+            }
+        });
+    }
+
+    function refresh() {
+        $("#dataGrid").datagrid('reload');
+    }
+</script>
+</body>
+</html>
