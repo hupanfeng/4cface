@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="xyz.uben._4cface.infra.persistent.member.WarehouseMapper">
-    <resultMap id="BaseResultMap" type="xyz.uben._4cface.domain.model.Warehouse">
+<mapper namespace="xyz.uben._4cface.infra.persistent.member.MemberMapper">
+    <resultMap id="BaseResultMap" type="xyz.uben._4cface.domain.model.Member">
         <id column="mid" property="mid" jdbcType="BIGINT"/>
         <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
@@ -12,14 +12,8 @@
     </sql>
 
     <delete id="delete"/>
-    <delete id="deleteWarehouse">
-        delete from tkb_toolwarehouse_toolinformation where warehouseId = #{warehouseId,jdbcType=DECIMAL}
-    </delete>
 
-    <insert id="insert"/>
-    <insert id="insertWarehouse">
-        insert into tkb_toolwarehouse_toolinformation (warehouseId,infoId) values(#{warehouseId,jdbcType=DECIMAL},#{infoId,jdbcType=DECIMAL})
-    </insert>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="mid"/>
 
     <update id="update"/>
 
