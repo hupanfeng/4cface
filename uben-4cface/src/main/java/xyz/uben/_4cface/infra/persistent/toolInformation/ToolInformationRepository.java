@@ -8,7 +8,7 @@ import xyz.uben.common.infra.persistent.IdGenerateStrategy;
 import xyz.uben._4cface.domain.model.TooInlformation;
 import xyz.uben._4cface.domain.model.Warehouse;
 import xyz.uben._4cface.infra.persistent.doctemplate.DocTemplateMapper;
-import xyz.uben._4cface.infra.persistent.warehouse.WarehouseRepository;
+import xyz.uben._4cface.infra.persistent.member.WarehouseRepository;
 
 import java.util.Date;
 import java.util.List;

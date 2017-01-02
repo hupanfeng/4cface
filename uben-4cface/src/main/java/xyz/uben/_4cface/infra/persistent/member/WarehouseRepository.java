@@ -1,4 +1,4 @@
-package xyz.uben._4cface.infra.persistent.warehouse;
+package xyz.uben._4cface.infra.persistent.member;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

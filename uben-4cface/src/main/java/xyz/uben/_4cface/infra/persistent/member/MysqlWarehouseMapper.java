@@ -1,4 +1,4 @@
-package xyz.uben._4cface.infra.persistent.warehouse;
+package xyz.uben._4cface.infra.persistent.member;
 
 import xyz.uben.common.infra.mybatis.mapper.annotation.SimpleMapper;
 

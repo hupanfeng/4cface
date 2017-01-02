@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import xyz.uben.common.infra.mybatis.page.PageParameter;
 import xyz.uben._4cface.application.WarehouseService;
 import xyz.uben._4cface.domain.model.Warehouse;
-import xyz.uben._4cface.infra.persistent.warehouse.WarehouseRepository;
+import xyz.uben._4cface.infra.persistent.member.WarehouseRepository;
 
 import java.util.List;
 

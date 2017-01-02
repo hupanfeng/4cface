@@ -8,7 +8,7 @@ import xyz.uben._4cface.application.DocService;
 import xyz.uben._4cface.application.ToolInformationService;
 import xyz.uben._4cface.domain.model.Doc;
 import xyz.uben._4cface.domain.model.TooInlformation;
-import xyz.uben._4cface.infra.persistent.warehouse.WarehouseRepository;
+import xyz.uben._4cface.infra.persistent.member.WarehouseRepository;
 import xyz.uben._4cface.infra.persistent.toolInformation.ToolInformationRepository;
 
 import java.util.List;
