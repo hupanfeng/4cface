@@ -3,113 +3,75 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>井下作业修井工具数据库系统</title>
+    <title>4C菲斯逆龄美肤中心</title>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <link rel="shortcut icon" href="/favicon.ico">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-
     <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
     <link rel="stylesheet" href="//g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
-
-
-
 </head>
 <body>
 <header class="bar bar-nav">
-    <h1 class='title'>注册系统账号</h1>
+    <h1 class='title'>注册会员</h1>
 </header>
 <div class="content">
-    <form id="form" >
-    <div class="list-block">
-        <ul>
-            <!-- Text inputs -->
-          <!--  <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-name"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">登录名</div>
-                        <div class="item-input">
-                            <input type="text" placeholder="Your name" name="loginname">
+    <form id="form">
+        <div class="list-block">
+            <ul>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">姓名</div>
+                            <div class="item-input">
+                                <input type="text" placeholder="请输入姓名" name="name" id="name">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>-->
-
-            <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-name"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">手机号</div>
-                        <div class="item-input">
-                            <input type="text" placeholder="请输入手机号" name="mobile" id="mobile">
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-name"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">手机号</div>
+                            <div class="item-input">
+                                <input type="text" placeholder="请输入手机号" name="mobile" id="mobile">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
-
-            <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-password"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">密码</div>
-                        <div class="item-input">
-                            <input type="password" placeholder="请输入密码" class="" name="password"  id="password">
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-email"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">邮箱</div>
+                            <div class="item-input">
+                                <input type="email" placeholder="E-mail" name="email">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
-            <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-password"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">再次确认密码</div>
-                        <div class="item-input">
-                            <input type="password" placeholder="请再次输入密码" class="" name="password" id="passwords" >
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon icon-form-email"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title label">推荐人</div>
+                            <div class="item-input">
+                                <input type="text" placeholder="推荐人手机号" name="referee">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
-            <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-name"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">姓名</div>
-                        <div class="item-input">
-                            <input type="text" placeholder="请输入姓名" name="name" id="name">
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-gender"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">员工号</div>
-                        <div class="item-input">
-                            <input type="text" placeholder="员工号" name="userNo">
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="item-content">
-                    <div class="item-media"><i class="icon icon-form-email"></i></div>
-                    <div class="item-inner">
-                        <div class="item-title label">邮箱</div>
-                        <div class="item-input">
-                            <input type="email" placeholder="E-mail" name="email">
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
+                </li>
+            </ul>
+        </div>
     </form>
     <div class="content-block">
         <div class="row">
-            <div class="col-50"><a href="JavaScript:WeixinJSBridge.call('closeWindow')" id="button" class="button button-big button-fill button-danger">取消</a></div>
-            <div class="col-50"><a href="#" id="submit" class="button button-big button-fill button-success">提交</a></div>
+            <div class="col-50"><a href="JavaScript:WeixinJSBridge.call('closeWindow')" id="button"
+                                   class="button button-big button-fill button-danger">取消</a></div>
+            <div class="col-50"><a href="#" id="submit" class="button button-big button-fill button-success">提交</a>
+            </div>
         </div>
     </div>
 </div>
@@ -117,50 +79,35 @@
 <div class="panel-overlay"></div>
 <script type='text/javascript' src='//g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
-<script type='text/javascript' src='//g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
 <script type='text/javascript' src='js/lib/vue.min.js' charset='utf-8'></script>
 <script type="text/javascript">
-$("#submit").click(function(){
-    if(!$("#mobile").val() || $("#mobile").val() == ''){
-        $.toast("请输入手机号", 2000);
-        return;
-    }
-    if(!$("#password").val() || $("#password").val() == ''){
-        $.toast("请输入密码", 2000);
-        return;
-    }
-    if(!$("#passwords").val() || $("#passwords").val() == ''){
-        $.toast("请再次输入密码", 2000);
-        return;
-    }
-    if($("#password").val()!=$("#passwords").val()){
-        $.toast("两次输入的密码不一致", 2000);
-        return;
-    }
-    if(!$("#name").val() || $("#name").val() == ''){
-        $.toast("请输入姓名", 2000);
-        return;
-    }
-
-    $.ajax({
-        cache: true,
-        type: "POST",
-        url: "../register/add",
-        data:$('#form').serialize(),
-        async: false,
-        dataType: "json",
-        success: function(data) {
-            if(data.success){
-                $.toast(data.msg, 6000);
-                window.location.href="user.html";
-            }else{
-                $.toast(data.msg, 2000);
-            }
+    $("#submit").click(function () {
+        if (!$("#mobile").val() || $("#mobile").val() == '') {
+            $.toast("请输入手机号", 2000);
+            return;
         }
-    });
+        if (!$("#name").val() || $("#name").val() == '') {
+            $.toast("请输入姓名", 2000);
+            return;
+        }
 
-
-})
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: "../member/register",
+            data: $('#form').serialize(),
+            async: false,
+            dataType: "json",
+            success: function (data) {
+                if (data.success) {
+                    $.toast(data.msg, 6000);
+                    window.location.href = "member.html";
+                } else {
+                    $.toast(data.msg, 2000);
+                }
+            }
+        });
+    })
 </script>
 <style>
     .warning {

@@ -48,11 +48,32 @@ public class MemberController extends BaseController {
         return grid;
     }
 
-    @RequestMapping("/get/{mid}")
+    @RequestMapping("/{mid}")
     @ResponseBody
     public Member get(@PathVariable("mid") Long mid) {
         Member member = memberService.query(mid);
         return member;
+    }
+
+    /**
+     * 注册会员
+     *
+     * @param member 会员实体
+     * @return
+     */
+    @RequestMapping("/register")
+    @ResponseBody
+    public Message register(Member member) {
+        Message m = new Message();
+        try {
+            memberService.add(member);
+            m.setMsg("注册成功");
+            m.setSuccess(true);
+        } catch (Exception e) {
+            logger.error("", e);
+            m.setMsg("注册失败");
+        }
+        return m;
     }
 
     /**

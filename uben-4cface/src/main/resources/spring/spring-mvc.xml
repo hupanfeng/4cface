@@ -73,18 +73,11 @@
                         <value>/weixin*</value>
                         <value>/ueditor/*</value>
                         <value>/upload*</value>
-                        <value>/doc/get/*</value>
-                        <value>/doc/dataGrid</value>
-                        <value>/cases/get/*</value>
                         <value>/passWord/*</value>
                         <value>/register/*</value>
                         <value>/wx/fan/bind</value>
                         <value>/wx/fan/get</value>
                         <value>/search*</value>
-                        <value>/toolcategory/list</value>
-                        <value>/toolInformation/dataGrid</value>
-                        <value>/cases/dataGrid</value>
-                        <value>/rbac/user/approval</value>
                     </list>
                 </property>
             </bean>

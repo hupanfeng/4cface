@@ -186,7 +186,7 @@
 
     <!-- 设置欢迎页面 -->
     <welcome-file-list>
-        <welcome-file>/index.html</welcome-file>
+        <welcome-file>/login.html</welcome-file>
     </welcome-file-list>
 
     <!-- 找不到页错误转向 -->
