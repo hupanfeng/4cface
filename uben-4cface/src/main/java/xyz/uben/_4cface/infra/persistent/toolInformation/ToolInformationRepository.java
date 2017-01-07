@@ -8,7 +8,7 @@ import xyz.uben.common.infra.persistent.IdGenerateStrategy;
 import xyz.uben._4cface.domain.model.TooInlformation;
 import xyz.uben._4cface.domain.model.Warehouse;
 import xyz.uben._4cface.infra.persistent.doctemplate.DocTemplateMapper;
-import xyz.uben._4cface.infra.persistent.member.WarehouseRepository;
+import xyz.uben._4cface.infra.persistent.member.MemberRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -21,7 +21,7 @@ public class ToolInformationRepository extends BaseRepository<TooInlformation, L
     @Autowired
     private ToolInformationMapper toolInformationMapper;
     @Autowired
-    WarehouseRepository warehouseRepository;
+    MemberRepository warehouseRepository;
 
     @Override
     public void add(TooInlformation toolInformation) {

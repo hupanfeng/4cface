@@ -1,0 +1,55 @@
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" title="" style="overflow: hidden;">
+        <form id="editUserPwdForm" method="post">
+            <table class="grid">
+                <tr>
+                    <td style="width:80px;">用户名称</td>
+                    <td id="name"></td>
+                </tr>
+                <tr>
+                    <td>原密码</td>
+                    <td><input name="oldpwd" type="password" placeholder="请输入原密码" class="easyui-textbox"
+                               data-options="required:true" style="height:28px"></td>
+                </tr>
+                <tr>
+                    <td>新密码</td>
+                    <td><input name="pwd" type="password" placeholder="请输入新密码" class="easyui-textbox"
+                               data-options="required:true" style="height:28px"></td>
+                </tr>
+                <tr>
+                    <td>确认密码</td>
+                    <td><input name="rePwd" type="password" placeholder="请再次输入新密码" class="easyui-textbox"
+                               data-options="required:true,validType:'eqPwd[\'#editUserPwdForm input[name=pwd]\']'" style='height:28px'>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#name").text(store.get("user").name);
+
+        $('#editUserPwdForm').form({
+            url: "rbac/user/editpwd",
+            onSubmit: function () {
+                progressLoad();
+                var isValid = $(this).form('validate');
+                if (!isValid) {
+                    progressClose();
+                }
+                return isValid;
+            },
+            success: function (result) {
+                progressClose();
+                result = $.parseJSON(result);
+                if (result.success) {
+                    parent.$.modalDialog.openner_dataGrid.datagrid('reload');//之所以能在这里调用到parent.$.modalDialog.openner_dataGrid这个对象，是因为user.jsp页面预定义好了
+                    parent.$.modalDialog.handler.dialog('close');
+                } else {
+                    parent.$.messager.alert('错误', result.msg, 'error');
+                }
+            }
+        });
+    });
+</script>

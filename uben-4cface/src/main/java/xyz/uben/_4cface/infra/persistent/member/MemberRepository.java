@@ -5,13 +5,9 @@ import org.springframework.stereotype.Repository;
 import xyz.uben._4cface.domain.model.Member;
 import xyz.uben.common.infra.mybatis.page.PageParameter;
 import xyz.uben.common.infra.persistent.BaseRepository;
-import xyz.uben._4cface.domain.model.Member;
 
 import java.util.List;
 
-/**
- * Created by xiong on 2016/11/7.
- */
 @Repository
 public class MemberRepository extends BaseRepository<Member, Long> {
     @Autowired
@@ -42,11 +38,4 @@ public class MemberRepository extends BaseRepository<Member, Long> {
         return memberMapper.queryByPage(member, page);
     }
 
-    public List<Member> queryAll() {
-        return memberMapper.queryAll();
-    }
-
-    public Member queryByName(String name) {
-        return memberMapper.queryByName(name);
-    }
 }

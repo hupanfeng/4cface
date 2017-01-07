@@ -3,8 +3,14 @@
 <mapper namespace="xyz.uben._4cface.infra.persistent.member.MemberMapper">
     <resultMap id="BaseResultMap" type="xyz.uben._4cface.domain.model.Member">
         <id column="mid" property="mid" jdbcType="BIGINT"/>
-        <result column="url" property="url" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="birthDay" property="birthDay" jdbcType="DATE"/>
+        <result column="point" property="point" jdbcType="DECIMAL"/>
+        <result column="grade" property="grade" jdbcType="DECIMAL"/>
+        <result column="referee" property="referee" jdbcType="VARCHAR"/>
+        <result column="refereeId" property="refereeId" jdbcType="DECIMAL"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -19,13 +25,16 @@
 
     <select id="select" resultMap="BaseResultMap"/>
 
-    <select id="queryByPage" resultMap="BaseResultMap">
-        SELECT * FROM tkb_toolwarehouse
+    <select id="queryByPage" parameterType="xyz.uben._4cface.domain.model.Member" resultMap="BaseResultMap">
+        SELECT * FROM member
+        <where>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="mobile != null and mobile !=''">
+                and mobile = #{mobile,jdbcType=VARCHAR}
+            </if>
+        </where>
     </select>
-    <select id="queryAll" resultMap="BaseResultMap">
-        SELECT * FROM tkb_toolwarehouse
-    </select>
-    <select id="queryByName" resultMap="BaseResultMap">
-         SELECT * FROM tkb_toolwarehouse where name= #{name ,jdbcType=VARCHAR}
-    </select>
+
 </mapper>

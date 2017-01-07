@@ -8,7 +8,7 @@ import xyz.uben._4cface.application.DocService;
 import xyz.uben._4cface.application.ToolInformationService;
 import xyz.uben._4cface.domain.model.Doc;
 import xyz.uben._4cface.domain.model.TooInlformation;
-import xyz.uben._4cface.infra.persistent.member.WarehouseRepository;
+import xyz.uben._4cface.infra.persistent.member.MemberRepository;
 import xyz.uben._4cface.infra.persistent.toolInformation.ToolInformationRepository;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class ToolInformationServiceImpl implements ToolInformationService {
     @Autowired
     private ToolInformationRepository toolInformationRepository;
     @Autowired
-    private WarehouseRepository warehouseRepository;
+    private MemberRepository warehouseRepository;
     @Autowired
     private DocService docService;
 

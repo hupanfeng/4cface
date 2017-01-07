@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import xyz.uben.common.infra.mybatis.page.PageParameter;
 import xyz.uben._4cface.application.WarehouseService;
 import xyz.uben._4cface.domain.model.Warehouse;
-import xyz.uben._4cface.infra.persistent.member.WarehouseRepository;
+import xyz.uben._4cface.infra.persistent.member.MemberRepository;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class WarehouseServiceImpl implements WarehouseService {
     @Autowired
-    private WarehouseRepository warehouseRepository;
+    private MemberRepository warehouseRepository;
 
     @Override
     public void add(Warehouse warehouse) {

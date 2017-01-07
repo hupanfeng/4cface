@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10;IE=EmulateIE9">
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="../../style/images/index/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../js/lib/easyui1.4.4/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../../style/wb.css">
+    <link rel="stylesheet" type="text/css" href="../../style/main.css"/>
+    <title>会员管理</title>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div data-options="region:'north',border:false" class="editBox-inputs">
+    <form id="searchForm">
+        <span class="datagrid-btn-separator"></span>
+        <strong>姓名:</strong><input name="name" placeholder="请输入会员姓名" class="easyui-textbox"/>
+        <strong>手机:</strong><input name="name" placeholder="请输入会员手机号" class="easyui-textbox"/>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" style="padding: 0 20px;"
+           data-options="iconCls:'icon_search'" onclick="ubenSearch();">查询</a>
+        <span class="datagrid-btn-separator"></span>
+        <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon_cancel',plain:true"
+           onclick="ubenClean();">清空</a>
+    </form>
+</div>
+<div data-options="region:'center',border:false">
+    <table id="dataGrid" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'name',sortable:true,align:'center',width:130">姓名</th>
+            <th data-options="field:'mobile',align:'center',width:100">电话</th>
+            <th data-options="field:'email',align:'center',width:185">邮箱</th>
+            <th data-options="field:'birthDay',align:'center',width:185">生日</th>
+            <th data-options="field:'point',sortable:true,align:'center',width:160">积分</th>
+            <th data-options="field:'grade',sortable:true,align:'center',width:500">等级</th>
+            <th data-options="field:'referee',sortable:true,align:'center',width:500">推荐人</th>
+            <th data-options="field:'stateid',align:'center',width:80" formatter="showState">状态</th>
+            <th data-options="field:'action',width:150,align:'center'" formatter="showaction">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<div id="toolbar" style="display: none;">
+    <a resource="add" onclick="add('member.html','会员');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-add'">添加</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="edit" onclick="edit(null,'member.html','会员');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-edit'">修改</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="delete" onclick="del(null,'delete');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon-remove'">删除</a>
+    <span class="datagrid-btn-separator"></span>
+    <a resource="add" onclick="imp('会员');" href="javascript:void(0);" class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'icon2_imp'">导入</a>
+</div>
+<script type="text/javascript" src="../../js/loader.js"></script>
+<script type="text/javascript">
+    loader.load('common', function () {
+        $(function () {
+            $("#dataGrid").datagrid({
+                toolbar: "#toolbar",
+                url: "dataGrid",
+                remoteSort: true,
+                sortName: "mid",
+                sortOrder: "asc",
+                rownumbers: true,
+                pagination: true,
+                pagePosition: "bottom",
+                pageList: [10, 50, 100, 200, 500],
+                pageSize: 10,
+                singleSelect: "true",
+                onDblClickRow: function (rowindex, rowdata) {
+                    if (isPermit("edit")) {
+                        edit(rowdata.mid, 'member.html', '会员');
+                    }
+                }
+            });
+            $("#toolbar").find("a").each(function () {
+                var resource = $(this).attr("resource");
+                if (!isPermit(resource)) {
+                    $(this).hide();
+                    $(this).next().remove();
+                }
+            });
+        });
+//        window.showState= function (value, row, index) {
+//            if (value == "-1") {
+//                return "锁定";
+//            } else if (value == "-2") {
+//                return "未审核";
+//            } else if (value==1){
+//                return "启用";
+//            }
+//        }
+    });
+
+   function groupFun(param) {
+        var ids = param.split(",");
+        var mid = ids[0];
+        var type = ids[1];
+        if (!param) {
+            return;
+        }
+        if (type && type == 'js') {
+            var saveButton = {
+                text: '解锁',
+                iconCls: 'icon-ok',
+                handler: function () {
+                    progressLoad();
+                    $.ajax({
+                        type: "get",
+                        url: parent.$.modalDialog.path + "unlock",
+                        data: {
+                            mid: mid
+                        },
+                        cache: false,
+                        dataType: "json",
+                        success: function (result) {
+                            progressClose();
+                            if (result.success) {
+                                parent.$.messager.alert('解锁成功', result.msg, 'info');
+                                parent.$.modalDialog.openner_dataGrid.datagrid('reload');//之所以能在这里调用到parent.$.modalDialog.openner_dataGrid这个对象，是因为user.jsp页面预定义好了
+                                parent.$.modalDialog.handler.dialog('close');
+                            } else {
+                                parent.$.messager.alert('错误', result.msg, 'error');
+                            }
+                        }
+                    });
+                }
+            };
+            var data = {
+                id: mid
+            };
+            pop("userUnlock.html", "解锁", 300, null, saveButton, data);
+        }
+    }
+    function groupFuns(param) {
+        var mid = param;
+        if (!param) {
+            return;
+        }
+        $.ajax({
+            type: "get",
+            url: "approval?mid=" + mid+"&stateid="+1,
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                parent.$.messager.alert('审核成功', '审核成功', 'info');
+                refresh();
+            }
+        });
+    };
+    function showaction(value, row, index) {
+        var object = {};
+        if (row.isdefault != 0) {
+            if (isPermit("edit")) {
+//                    object["setGroup"] = {"func": "groupFun", "paramid": row.mid + "," + "qz", "name": "群组"};
+                object["unlock"] = {"func": "groupFun", "paramid": row.mid + "," + "js", "name": "解锁"};
+                object["unlocks"] = {"func": "groupFuns", "paramid": row.mid, "name": "审核"};
+            }
+        }
+        return pubAction(object);
+    }
+    function refresh() {
+        $("#dataGrid").datagrid('reload');
+    }
+</script>
+</body>
+</html>
